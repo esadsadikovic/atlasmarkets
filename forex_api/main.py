@@ -27,6 +27,7 @@ DAGON_OP  = "https://brilliant-freedom-production-6a76.up.railway.app"
 app = FastAPI(
     title="AtlasMarkets — Apollo",
     version="1.0.0",
+    contact={"email": "max.sadikovic@gmail.com"},
     openapi_extra={
         "x-agentcash-provenance": {
             "ownershipProofs": [
@@ -37,15 +38,39 @@ app = FastAPI(
                 "d6ec3f51dbebbb6c945e65d6de81f665c32fef26b8761b9bd961cc77519103f05e9d9bdbf356d2d47af2b5edbcfe68c3b38c64621ea77d059fc734d5a041ea2f1b",
             ]
         },
-        "x-agentcash-guidance": {
-            "llmsTxtUrl": "https://x402scan.com/atlasmarkets/llms.txt"
-        },
     },
 )
 
+# ── Root-level OpenAPI extensions ─────────────────────────────────────────────
+_orig_openapi = app.openapi
+
+def _patched_openapi():
+    schema = _orig_openapi()
+    schema["info"]["x-guidance"] = (
+        "AtlasMarkets Apollo provides forex market intelligence for AI agents. "
+        "Routes: GET /api/apollo/signals ($0.05), GET /api/apollo/forecast?asset=EUR/USD ($0.05), "
+        "GET /api/apollo/risk ($0.02), GET /api/apollo/preflight?asset=EUR/USD ($0.05), "
+        "GET /api/apollo/history?asset=EUR/USD ($0.05), GET /api/apollo/audit?decision_id=X ($0.07), "
+        "POST /api/apollo/decision?symbol=EUR/USD ($0.15). All routes return real-time forex data."
+    )
+    schema["x-x402"] = {
+        "network": "eip155:8453",
+        "payTo": "0x8eB96caA976De43027FEf619c4D24F6679486277",
+        "facilitator": "https://facilitator.pantai.network",
+        "extensions": {
+            "bazaar": {
+                "status": "live",
+                "purpose": "AtlasMarkets Apollo forex market intelligence for AI agents.",
+            }
+        },
+    }
+    return schema
+
+app.openapi = _patched_openapi
+
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
-FACILITATOR_URL = os.environ.get("FACILITATOR_URL", "https://facilitator.payai.network")
+FACILITATOR_URL = os.environ.get("FACILITATOR_URL", "https://facilitator.pantai.network")
 NETWORK = "eip155:8453"
 
 _facilitator = HTTPFacilitatorClient({"url": FACILITATOR_URL})
