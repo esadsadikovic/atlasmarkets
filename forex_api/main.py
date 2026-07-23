@@ -18,7 +18,7 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 
-app = FastAPI(title="AtlasMarkets — Apollo", version="1.0.0")
+app = FastAPI(title="AtlasMarkets — Apollo", version="1.0.0", contact={"email": "max.sadikovic@gmail.com"})
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -179,7 +179,7 @@ def signal_score(pct: float) -> float:
     },
     responses={402: {"description": "Payment Required"}}
 )
-def signals(timeframe: str = "4h"):
+def signals(timeframe: str = Query(..., description="Timeframe for signals (15m, 1h, 4h, 1d)")):
     """Apollo Signals — forex pair rates and momentum signals."""
     all_signals = get_forex_signals()
     sorted_signals = sorted(all_signals.items(), key=lambda x: x[1], reverse=True)
@@ -205,7 +205,7 @@ def signals(timeframe: str = "4h"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def decision(symbol: str = Query(default="EURUSD", description="Forex pair e.g. EURUSD, GBPUSD, USDJPY")):
+def decision(symbol: str = Query(..., description="Forex pair e.g. EURUSD, GBPUSD, USDJPY")):
     """Apollo Decision — BUY / SELL / HOLD for forex pair."""
     sym = symbol.upper()
     signals = get_forex_signals()
@@ -328,7 +328,11 @@ def risk():
     )
 
 
-@app.get("/health")
+@app.get("/health",
+    openapi_extra={
+        "security": []
+    }
+)
 def health():
     return {"status": "ok", "service": "atlasmarkets-apollo", "version": "1.0.0"}
 
@@ -388,7 +392,7 @@ def preflight(symbol: str = "EURUSD"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def history(symbol: str = "EURUSD", limit: int = 10):
+def history(symbol: str = "EURUSD", limit: int = Query(10, description="Number of recent records to return")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

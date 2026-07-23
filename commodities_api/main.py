@@ -19,7 +19,7 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 
-app = FastAPI(title="AtlasMarkets — Pollux", version="1.0.0")
+app = FastAPI(title="AtlasMarkets — Pollux", version="1.0.0", contact={"email": "max.sadikovic@gmail.com"})
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -180,7 +180,7 @@ def signal_score(pct: float) -> float:
     },
     responses={402: {"description": "Payment Required"}}
 )
-def signals(timeframe: str = "1d"):
+def signals(timeframe: str = Query(..., description="Timeframe for signals (15m, 1h, 4h, 1d)")):
     """Pollux Signals — commodity prices and momentum signals."""
     all_signals = get_all_commodities()
     sorted_signals = sorted(all_signals.items(), key=lambda x: x[1], reverse=True)
@@ -206,7 +206,7 @@ def signals(timeframe: str = "1d"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def decision(symbol: str = Query(default="Gold (XAU/USD)", description="Commodity name as listed")):
+def decision(symbol: str = Query(..., description="Commodity name (XAU, XAG, WTI, NG, HG)")):
     """Pollux Decision — BUY / SELL / HOLD for commodities."""
     sym = symbol
     data = get_all_commodities()
@@ -335,7 +335,11 @@ def risk():
     )
 
 
-@app.get("/health")
+@app.get("/health",
+    openapi_extra={
+        "security": []
+    }
+)
 def health():
     return {"status": "ok", "service": "atlasmarkets-pollux", "version": "1.0.0"}
 
@@ -397,7 +401,7 @@ def preflight(symbol: str = "Gold (XAU/USD)"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def history(symbol: str = "Gold (XAU/USD)", limit: int = 10):
+def history(symbol: str = "Gold (XAU/USD)", limit: int = Query(10, description="Number of recent records to return")):
     """Recent context history for analysis and audit support."""
     sym = symbol
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

@@ -19,7 +19,7 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 
-app = FastAPI(title="AtlasMarkets — Viking", version="1.0.0")
+app = FastAPI(title="AtlasMarkets — Viking", version="1.0.0", contact={"email": "max.sadikovic@gmail.com"})
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -165,7 +165,7 @@ def signal_score(pct: float) -> float:
     },
     responses={402: {"description": "Payment Required"}}
 )
-def signals(timeframe: str = "1d"):
+def signals(timeframe: str = Query(..., description="Timeframe for signals (15m, 1h, 4h, 1d)")):
     """Viking Signals — market context for S&P 500, Nasdaq, Dow, and major stocks."""
     tickers = ["SPY", "QQQ", "DIA", "AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"]
     result = {}
@@ -200,7 +200,7 @@ def signals(timeframe: str = "1d"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def decision(symbol: str = Query(default="SPY", description="Stock ticker e.g. SPY, QQQ, AAPL")):
+def decision(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, AAPL")):
     """Viking Decision — BUY / SELL / HOLD with confidence for any ticker."""
     sym = symbol.upper()
     q = get_stock_quote(sym)
@@ -348,7 +348,11 @@ def risk():
 
 # ─── Health ──────────────────────────────────────────────────────────────────
 
-@app.get("/health")
+@app.get("/health",
+    openapi_extra={
+        "security": []
+    }
+)
 def health():
     return {"status": "ok", "service": "atlasmarkets-viking", "version": "1.0.0"}
 
@@ -407,7 +411,7 @@ def preflight(symbol: str = "SPY"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def history(symbol: str = "SPY", limit: int = 10):
+def history(symbol: str = "SPY", limit: int = Query(10, description="Number of recent records to return")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

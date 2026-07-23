@@ -20,7 +20,7 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 
-app = FastAPI(title="AtlasMarkets — Anubis", version="1.0.0")
+app = FastAPI(title="AtlasMarkets — Anubis", version="1.0.0", contact={"email": "max.sadikovic@gmail.com"})
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -185,7 +185,7 @@ def signal_score(pct_24h: float) -> float:
     },
     responses={402: {"description": "Payment Required"}}
 )
-def signals(timeframe: str = "15m"):
+def signals(timeframe: str = Query(..., description="Timeframe for signals (15m, 1h, 4h, 1d)")):
     """Anubis Signals — market context, score details, and freshness."""
     symbols = ["BTC", "ETH", "SOL", "XRP", "ADA"]
     result = {}
@@ -219,7 +219,7 @@ def signals(timeframe: str = "15m"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def decision(symbol: str = Query(default="BTC", description="Crypto symbol e.g. BTC, ETH")):
+def decision(symbol: str = Query(..., description="Crypto symbol e.g. BTC, ETH")):
     """Anubis Decision — probabilistic journal entry with decision_id."""
     sym = symbol.upper()
     data = get_crypto_price(sym.lower())
@@ -264,7 +264,7 @@ def decision(symbol: str = Query(default="BTC", description="Crypto symbol e.g. 
     },
     responses={402: {"description": "Payment Required"}}
 )
-def audit(decision_id: str, window: str = "1h"):
+def audit(decision_id: str = Query(..., description="Decision UUID from /decision endpoint"), window: str = Query("1h", description="Evaluation window (1h, 4h, 24h)")):
     """Anubis Audit — verify prior decision outcome against real prices."""
     data = get_crypto_price("btc")
     entry_price = data["price"] if data else 67000.0
@@ -300,7 +300,7 @@ def audit(decision_id: str, window: str = "1h"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def forecast(symbol: str = "BTC"):
+def forecast(symbol: str = Query(..., description="Asset symbol (e.g. BTC, ETH)")):
     """Anubis Forecast — conformally-calibrated 80% price range."""
     sym = symbol.upper()
     data = get_crypto_price(sym.lower())
@@ -364,7 +364,11 @@ def risk():
 
 # ─── Health ──────────────────────────────────────────────────────────────────
 
-@app.get("/health")
+@app.get("/health",
+    openapi_extra={
+            "security": []
+        }
+    )
 def health():
     return {"status": "ok", "service": "atlasmarkets-crypto", "version": "1.0.0"}
 
@@ -383,7 +387,7 @@ _decision_log: list[dict] = []
     },
     responses={402: {"description": "Payment Required"}}
 )
-def preflight(symbol: str = "BTC"):
+def preflight(symbol: str = Query(..., description="Asset symbol (e.g. BTC, ETH)")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     data = get_crypto_price(sym.lower())
@@ -425,7 +429,7 @@ def preflight(symbol: str = "BTC"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def history(symbol: str = "BTC", limit: int = 10):
+def history(symbol: str = Query(..., description="Asset symbol (e.g. BTC, ETH)"), limit: int = Query(10, description="Number of recent records to return")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

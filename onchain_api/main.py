@@ -19,7 +19,7 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 
-app = FastAPI(title="AtlasMarkets — Dagon", version="1.0.0")
+app = FastAPI(title="AtlasMarkets — Dagon", version="1.0.0", contact={"email": "max.sadikovic@gmail.com"})
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -217,7 +217,7 @@ def signal_score(gwei: float) -> float:
     },
     responses={402: {"description": "Payment Required"}}
 )
-def signals(timeframe: str = "15m"):
+def signals(timeframe: str = Query(..., description="Timeframe for signals (15m, 1h, 4h, 1d)")):
     """Dagon Signals — ETH gas, BTC fees, DeFi TVL, whale alerts."""
     gas = get_eth_gas()
     fees = get_btc_fees()
@@ -251,7 +251,7 @@ def signals(timeframe: str = "15m"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def decision(symbol: str = Query(default="ETH", description="ETH or BTC")):
+def decision(symbol: str = Query(..., description="ETH or BTC")):
     """Dagon Decision — whether to interact on-chain now."""
     sym = symbol.upper()
     gas = get_eth_gas()
@@ -291,7 +291,7 @@ def decision(symbol: str = Query(default="ETH", description="ETH or BTC")):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def audit(decision_id: str, window: str = "1h"):
+def audit(decision_id: str = Query(..., description="Decision UUID from /decision endpoint"), window: str = Query("1h", description="Evaluation window (1h, 4h, 24h)")):
     """Dagon Audit — verify prior on-chain decision."""
     gas = get_eth_gas()
     entry_gwei = gas["propose_gwei"]
@@ -381,7 +381,11 @@ def risk():
     )
 
 
-@app.get("/health")
+@app.get("/health",
+    openapi_extra={
+        "security": []
+    }
+)
 def health():
     return {"status": "ok", "service": "atlasmarkets-dagon", "version": "1.0.0"}
 
@@ -439,7 +443,7 @@ def preflight(symbol: str = "ETH"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def history(symbol: str = "ETH", limit: int = 10):
+def history(symbol: str = "ETH", limit: int = Query(10, description="Number of recent records to return")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]
