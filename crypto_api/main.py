@@ -20,7 +20,7 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 
-app = FastAPI(title="AtlasMarkets — Anubis", version="1.0.0", contact={"email": "max.sadikovic@gmail.com"})
+app = FastAPI(title="AtlasMarkets — Anubis", version="1.0.0")
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -127,6 +127,7 @@ class SignalsResponse(BaseModel):
     signal_age_hours: float
     data_freshness: str
 
+
 class DecisionResponse(BaseModel):
     decision_id: str
     symbol: str
@@ -140,6 +141,7 @@ class DecisionResponse(BaseModel):
     data_freshness: str
     next_step: dict
 
+
 class AuditResponse(BaseModel):
     decision_id: str
     symbol: str
@@ -149,12 +151,14 @@ class AuditResponse(BaseModel):
     prices: dict
     outcome: dict
 
+
 class ForecastResponse(BaseModel):
     symbol: str
     ts: str
     regime: str
     forecast: dict
     data_freshness: str
+
 
 class RiskResponse(BaseModel):
     ts: str
@@ -164,6 +168,7 @@ class RiskResponse(BaseModel):
     cooldown_active: bool
     data_freshness: str
 
+
 # ─── Regime helpers ──────────────────────────────────────────────────────────
 
 def regime_from_change(pct_24h: float) -> str:
@@ -171,8 +176,10 @@ def regime_from_change(pct_24h: float) -> str:
     if pct_24h < -5:  return "bearish"
     return "chop"
 
+
 def signal_score(pct_24h: float) -> float:
     return round(max(-1, min(1, pct_24h / 10)), 4)
+
 
 # ─── Endpoints ───────────────────────────────────────────────────────────────
 
@@ -182,30 +189,22 @@ def signal_score(pct_24h: float) -> float:
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Timeframe: 15m, 1h, 4h, 1d", "example": "1h"}}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {"timeframe": {"type": "string", "description": "Timeframe: 15m, 1h, 4h, 1d", "example": "1h"}},
-                        "required": []
+                        "properties": {},
+                        "additionalProperties": False
                     }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
-def signals(timeframe: str = Query(..., description="Timeframe for signals (15m, 1h, 4h, 1d)")):
+def signals(timeframe: str = "15m"):
     """Anubis Signals — market context, score details, and freshness."""
     symbols = ["BTC", "ETH", "SOL", "XRP", "ADA"]
     result = {}
@@ -235,31 +234,11 @@ def signals(timeframe: str = Query(..., description="Timeframe for signals (15m,
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.150000"},
             "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Crypto symbol e.g. BTC, ETH"}}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
-        "requestBody": {
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "Crypto symbol e.g. BTC, ETH"}},
-                        "required": []
-                    }
-                }
-            }
         }
     },
     responses={402: {"description": "Payment Required"}}
 )
-def decision(symbol: str = Query(..., description="Crypto symbol e.g. BTC, ETH")):
+def decision(symbol: str = Query(default="BTC", description="Crypto symbol e.g. BTC, ETH")):
     """Anubis Decision — probabilistic journal entry with decision_id."""
     sym = symbol.upper()
     data = get_crypto_price(sym.lower())
@@ -301,33 +280,22 @@ def decision(symbol: str = Query(..., description="Crypto symbol e.g. BTC, ETH")
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"decision_id": {"type": "string", "description": "UUID from /decision endpoint"}, "window": {"type": "string", "description": "Evaluation window: 1h, 4h, 24h", "example": "1h"}}, "required": ["decision_id"]},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string", "description": "UUID from /decision endpoint", "example": "123e4567-e89b-12d3-a456-426614174000"},
-                            "window": {"type": "string", "description": "Evaluation window (1h, 4h, 24h)", "example": "1h"}
-                        },
-                        "required": ["decision_id"]
+                        "properties": {},
+                        "additionalProperties": False
                     }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
-def audit(decision_id: str = Query(..., description="Decision UUID from /decision endpoint"), window: str = Query("1h", description="Evaluation window (1h, 4h, 24h)")):
+def audit(decision_id: str, window: str = "1h"):
     """Anubis Audit — verify prior decision outcome against real prices."""
     data = get_crypto_price("btc")
     entry_price = data["price"] if data else 67000.0
@@ -360,30 +328,22 @@ def audit(decision_id: str = Query(..., description="Decision UUID from /decisio
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"}}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"}},
-                        "required": []
+                        "properties": {},
+                        "additionalProperties": False
                     }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
-def forecast(symbol: str = Query(..., description="Asset symbol (e.g. BTC, ETH)")):
+def forecast(symbol: str = "BTC"):
     """Anubis Forecast — conformally-calibrated 80% price range."""
     sym = symbol.upper()
     data = get_crypto_price(sym.lower())
@@ -415,22 +375,18 @@ def forecast(symbol: str = Query(..., description="Asset symbol (e.g. BTC, ETH)"
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
-                    "schema": {"type": "object", "properties": {}, "required": []}
+                    "schema": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False
+                    }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -463,7 +419,7 @@ def risk():
 
 # ─── Health ──────────────────────────────────────────────────────────────────
 
-@app.get("/health", openapi_extra={"security": []})
+@app.get("/health")
 def health():
     return {"status": "ok", "service": "atlasmarkets-crypto", "version": "1.0.0"}
 
@@ -479,30 +435,22 @@ _decision_log: list[dict] = []
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"}}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"}},
-                        "required": []
+                        "properties": {},
+                        "additionalProperties": False
                     }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
-def preflight(symbol: str = Query(..., description="Asset symbol (e.g. BTC, ETH)")):
+def preflight(symbol: str = "BTC"):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     data = get_crypto_price(sym.lower())
@@ -541,33 +489,22 @@ def preflight(symbol: str = Query(..., description="Asset symbol (e.g. BTC, ETH)
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"}, "limit": {"type": "integer", "description": "Number of records to return", "example": 10}}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"},
-                            "limit": {"type": "integer", "description": "Number of records to return", "example": 10}
-                        },
-                        "required": []
+                        "properties": {},
+                        "additionalProperties": False
                     }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
-def history(symbol: str = Query(..., description="Asset symbol (e.g. BTC, ETH)"), limit: int = Query(10, description="Number of recent records to return")):
+def history(symbol: str = "BTC", limit: int = 10):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

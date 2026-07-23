@@ -19,7 +19,7 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 
-app = FastAPI(title="AtlasMarkets — Viking", version="1.0.0", contact={"email": "max.sadikovic@gmail.com"})
+app = FastAPI(title="AtlasMarkets — Viking", version="1.0.0")
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -162,32 +162,22 @@ def signal_score(pct: float) -> float:
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Timeframe: 15m, 1h, 4h, 1d", "example": "1h"}}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {
-                            "timeframe": {"type": "string", "description": "Timeframe: 15m, 1h, 4h, 1d", "example": "1h"}
-                        },
-                        "required": []
+                        "properties": {},
+                        "additionalProperties": False
                     }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
-def signals(timeframe: str = Query(..., description="Timeframe for signals (15m, 1h, 4h, 1d)")):
+def signals(timeframe: str = "1d"):
     """Viking Signals — market context for S&P 500, Nasdaq, Dow, and major stocks."""
     tickers = ["SPY", "QQQ", "DIA", "AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"]
     result = {}
@@ -218,33 +208,11 @@ def signals(timeframe: str = Query(..., description="Timeframe for signals (15m,
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.150000"},
             "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL"}}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
-        "requestBody": {
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL"}
-                        },
-                        "required": []
-                    }
-                }
-            }
         }
     },
     responses={402: {"description": "Payment Required"}}
 )
-def decision(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, AAPL")):
+def decision(symbol: str = Query(default="SPY", description="Stock ticker e.g. SPY, QQQ, AAPL")):
     """Viking Decision — BUY / SELL / HOLD with confidence for any ticker."""
     sym = symbol.upper()
     q = get_stock_quote(sym)
@@ -287,33 +255,22 @@ def decision(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, A
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"decision_id": {"type": "string", "description": "UUID from /decision endpoint"}, "window": {"type": "string", "description": "Evaluation window: 1h, 4h, 24h", "example": "1h"}}, "required": ["decision_id"]},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string", "description": "UUID from /decision endpoint", "example": "123e4567-e89b-12d3-a456-426614174000"},
-                            "window": {"type": "string", "description": "Evaluation window (1h, 4h, 24h)", "example": "1h"}
-                        },
-                        "required": ["decision_id"]
+                        "properties": {},
+                        "additionalProperties": False
                     }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
-def audit(decision_id: str = Query(...), window: str = Query("1h", description="Evaluation window (1h, 4h, 24h)")):
+def audit(decision_id: str, window: str = "1d"):
     """Viking Audit — verify prior decision against real price movement."""
     q = get_stock_quote("SPY")
     entry_price = q["price"] if q else 540.0
@@ -345,30 +302,22 @@ def audit(decision_id: str = Query(...), window: str = Query("1h", description="
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL", "example": "SPY"}}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL", "example": "SPY"}},
-                        "required": []
+                        "properties": {},
+                        "additionalProperties": False
                     }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
-def forecast(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, AAPL", examples=["SPY"])):
+def forecast(symbol: str = "SPY"):
     """Viking Forecast — conformally-calibrated 80% price range."""
     sym = symbol.upper()
     q = get_stock_quote(sym)
@@ -401,22 +350,18 @@ def forecast(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, A
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
-                    "schema": {"type": "object", "properties": {}, "required": []}
+                    "schema": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False
+                    }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -451,7 +396,7 @@ def risk():
 
 # ─── Health ──────────────────────────────────────────────────────────────────
 
-@app.get("/health", openapi_extra={"security": []})
+@app.get("/health")
 def health():
     return {"status": "ok", "service": "atlasmarkets-viking", "version": "1.0.0"}
 
@@ -465,30 +410,22 @@ _decision_log: list[dict] = []
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL", "example": "SPY"}}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL", "example": "SPY"}},
-                        "required": []
+                        "properties": {},
+                        "additionalProperties": False
                     }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
-def preflight(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, AAPL", examples=["SPY"])):
+def preflight(symbol: str = "SPY"):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     q = get_stock_quote(sym)
@@ -527,33 +464,22 @@ def preflight(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, 
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL", "example": "SPY"}, "limit": {"type": "integer", "description": "Number of records to return", "example": 10}}, "required": []},
-                    "output": {"type": "object", "properties": {}}
-                },
-                "type": "object"
-            }
-        },
         "requestBody": {
+            "required": False,
             "content": {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL", "example": "SPY"},
-                            "limit": {"type": "integer", "description": "Number of records to return", "example": 10}
-                        },
-                        "required": []
+                        "properties": {},
+                        "additionalProperties": False
                     }
                 }
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
-def history(symbol: str = "SPY", limit: int = Query(10, description="Number of recent records to return")):
+def history(symbol: str = "SPY", limit: int = 10):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]
