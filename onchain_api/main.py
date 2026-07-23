@@ -320,7 +320,7 @@ def audit(decision_id: str = Query(..., description="Decision UUID from /decisio
     },
     responses={402: {"description": "Payment Required"}}
 )
-def forecast(symbol: str = Query(..., description="ETH or BTC", example="ETH")):
+def forecast(symbol: str = Query(..., description="ETH or BTC", examples=["ETH"])):
     """Dagon Forecast — expected gas range over next 1h."""
     gas = get_eth_gas()
     gwei = gas["propose_gwei"]
@@ -381,7 +381,7 @@ def risk():
     )
 
 
-@app.get("/health", security=[])
+@app.get("/health", openapi_extra={"security": []})
 def health():
     return {"status": "ok", "service": "atlasmarkets-dagon", "version": "1.0.0"}
 
@@ -398,7 +398,7 @@ _decision_log: list[dict] = []
     },
     responses={402: {"description": "Payment Required"}}
 )
-def preflight(symbol: str = Query(..., description="ETH or BTC", example="ETH")):
+def preflight(symbol: str = Query(..., description="ETH or BTC", examples=["ETH"])):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     gas = get_eth_gas()
@@ -439,7 +439,7 @@ def preflight(symbol: str = Query(..., description="ETH or BTC", example="ETH"))
     },
     responses={402: {"description": "Payment Required"}}
 )
-def history(symbol: str = "ETH", limit: int = Query(10, description="Number of recent records to return")):
+def history(symbol: str = Query(..., description="ETH or BTC", examples=["ETH"]), limit: int = Query(10, description="Number of recent records to return")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

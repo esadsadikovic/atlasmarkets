@@ -277,7 +277,7 @@ def audit(decision_id: str, window: str = "4h"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def forecast(symbol: str = Query(..., description="Forex pair e.g. EURUSD, GBPUSD, USDJPY", example="EURUSD")):
+def forecast(symbol: str = Query(..., description="Forex pair e.g. EURUSD, GBPUSD, USDJPY", examples=["EURUSD"])):
     """Apollo Forecast — 80% calibrated forex range."""
     sym = symbol.upper()
     signals = get_forex_signals()
@@ -328,7 +328,7 @@ def risk():
     )
 
 
-@app.get("/health", security=[])
+@app.get("/health", openapi_extra={"security": []})
 def health():
     return {"status": "ok", "service": "atlasmarkets-apollo", "version": "1.0.0"}
 
@@ -345,7 +345,7 @@ _decision_log: list[dict] = []
     },
     responses={402: {"description": "Payment Required"}}
 )
-def preflight(symbol: str = Query(..., description="Forex pair e.g. EURUSD, GBPUSD, USDJPY", example="EURUSD")):
+def preflight(symbol: str = Query(..., description="Forex pair e.g. EURUSD, GBPUSD, USDJPY", examples=["EURUSD"])):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     signals = get_forex_signals()
@@ -388,7 +388,7 @@ def preflight(symbol: str = Query(..., description="Forex pair e.g. EURUSD, GBPU
     },
     responses={402: {"description": "Payment Required"}}
 )
-def history(symbol: str = "EURUSD", limit: int = Query(10, description="Number of recent records to return")):
+def history(symbol: str = Query(..., description="Forex pair e.g. EURUSD, GBPUSD, USDJPY", examples=["EURUSD"]), limit: int = Query(10, description="Number of recent records to return")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

@@ -278,7 +278,7 @@ def audit(decision_id: str, window: str = "1d"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def forecast(symbol: str = Query(..., description="Commodity (XAU, XAG, WTI, NG, HG)", example="XAU")):
+def forecast(symbol: str = Query(..., description="Commodity (XAU, XAG, WTI, NG, HG)", examples=["XAU"])):
     """Pollux Forecast — 80% calibrated commodity range."""
     sym = symbol
     data = get_all_commodities()
@@ -335,7 +335,7 @@ def risk():
     )
 
 
-@app.get("/health", security=[])
+@app.get("/health", openapi_extra={"security": []})
 def health():
     return {"status": "ok", "service": "atlasmarkets-pollux", "version": "1.0.0"}
 
@@ -352,7 +352,7 @@ _decision_log: list[dict] = []
     },
     responses={402: {"description": "Payment Required"}}
 )
-def preflight(symbol: str = Query(..., description="Commodity (XAU, XAG, WTI, NG, HG)", example="XAU")):
+def preflight(symbol: str = Query(..., description="Commodity (XAU, XAG, WTI, NG, HG)", examples=["XAU"])):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol
     data = get_all_commodities()
@@ -397,7 +397,7 @@ def preflight(symbol: str = Query(..., description="Commodity (XAU, XAG, WTI, NG
     },
     responses={402: {"description": "Payment Required"}}
 )
-def history(symbol: str = "Gold (XAU/USD)", limit: int = Query(10, description="Number of recent records to return")):
+def history(symbol: str = Query(..., description="Commodity (XAU, XAG, WTI, NG, HG)", examples=["XAU"]), limit: int = Query(10, description="Number of recent records to return")):
     """Recent context history for analysis and audit support."""
     sym = symbol
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

@@ -364,7 +364,7 @@ def risk():
 
 # ─── Health ──────────────────────────────────────────────────────────────────
 
-@app.get("/health", security=[])
+@app.get("/health", openapi_extra={"security": []})
 def health():
     return {"status": "ok", "service": "atlasmarkets-crypto", "version": "1.0.0"}
 
