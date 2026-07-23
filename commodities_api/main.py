@@ -176,6 +176,19 @@ def signal_score(pct: float) -> float:
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
+        },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "timeframe": {"type": "string", "description": "Timeframe for signals (15m, 1h, 4h, 1d)", "example": "1h"}
+                        },
+                        "required": []
+                    }
+                }
+            }
         }
     },
     responses={402: {"description": "Payment Required"}}
@@ -244,11 +257,25 @@ def decision(symbol: str = Query(..., description="Commodity name (XAU, XAG, WTI
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"},
             "protocols": [{"x402": {}}]
+        },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "decision_id": {"type": "string", "description": "Decision UUID from /decision endpoint", "example": "123e4567-e89b-12d3-a456-426614174000"},
+                            "window": {"type": "string", "description": "Evaluation window (1h, 4h, 24h)", "example": "1h"}
+                        },
+                        "required": []
+                    }
+                }
+            }
         }
     },
     responses={402: {"description": "Payment Required"}}
 )
-def audit(decision_id: str, window: str = "1d"):
+def audit(decision_id: str = Query(...), window: str = Query("1h", description="Evaluation window (1h, 4h, 24h)")):
     """Pollux Audit — verify prior commodity decision."""
     gold = get_commodity_price("GC=F") or 2350.0
     entry = gold
@@ -274,6 +301,19 @@ def audit(decision_id: str, window: str = "1d"):
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
+        },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string", "description": "Commodity (XAU, XAG, WTI, NG, HG)", "example": "XAU"}
+                        },
+                        "required": []
+                    }
+                }
+            }
         }
     },
     responses={402: {"description": "Payment Required"}}
@@ -306,6 +346,13 @@ def forecast(symbol: str = Query(..., description="Commodity (XAU, XAG, WTI, NG,
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"},
             "protocols": [{"x402": {}}]
+        },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {"type": "object", "properties": {}, "required": []}
+                }
+            }
         }
     },
     responses={402: {"description": "Payment Required"}}
@@ -348,6 +395,19 @@ _decision_log: list[dict] = []
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
+        },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string", "description": "Commodity (XAU, XAG, WTI, NG, HG)", "example": "XAU"}
+                        },
+                        "required": []
+                    }
+                }
+            }
         }
     },
     responses={402: {"description": "Payment Required"}}
@@ -393,6 +453,20 @@ def preflight(symbol: str = Query(..., description="Commodity (XAU, XAG, WTI, NG
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
+        },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string", "description": "Commodity (XAU, XAG, WTI, NG, HG)", "example": "XAU"},
+                            "limit": {"type": "integer", "description": "Number of recent records to return", "example": 10}
+                        },
+                        "required": []
+                    }
+                }
+            }
         }
     },
     responses={402: {"description": "Payment Required"}}
