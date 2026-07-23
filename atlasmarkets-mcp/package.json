@@ -1,0 +1,36 @@
+{
+  "name": "atlasmarkets-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for AtlasMarkets crypto and stock signal APIs — enables AI agents to discover and call AtlasMarkets market signals via x402 payments",
+  "main": "index.js",
+  "bin": {
+    "atlasmarkets-mcp": "./index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "atlasmarkets",
+    "crypto",
+    "stock",
+    "market-signals",
+    "x402",
+    "trading",
+    "ai-agent"
+  ],
+  "author": "AtlasMarkets",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "peerDependencies": {
+    "node": ">=18.0.0"
+  }
+}

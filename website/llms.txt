@@ -1,0 +1,103 @@
+# AtlasMarkets — AI Agent Market Intelligence
+
+AtlasMarkets provides calibrated market signals, probabilistic decisions, audit trails, and on-chain data for AI agents. Pay per call in USDC via x402 on Base.
+
+## Product Loop
+Read the range and risk context, log a decision only when useful, then verify the outcome.
+
+## Signal Scoring
+- Positive / Negative: Bullish / Bearish market context
+- 0.00–0.01: Weak magnitude
+- 0.01–0.03: Moderate magnitude
+- 0.03+: Strong magnitude
+
+## Pricing (per call, in USDC)
+
+| Endpoint | Price |
+|----------|-------|
+| /signals   | $0.05 |
+| /preflight | $0.05 |
+| /history   | $0.05 |
+| /decision  | $0.15 |
+| /audit     | $0.07 |
+| /forecast  | $0.05 |
+| /risk      | $0.02 |
+
+## Five Market Verticals
+
+### 1. Anubis — Crypto (port 8001)
+BTC, ETH, SOL, XRP, ADA via CoinGecko.
+- GET /api/anubis/signals
+- GET /api/anubis/preflight
+- GET /api/anubis/history
+- GET /api/anubis/decision
+- GET /api/anubis/audit
+- GET /api/anubis/forecast
+- GET /api/anubis/risk
+
+### 2. Viking — Stocks (port 8002)
+SPY, QQQ, DIA, AAPL, MSFT, GOOGL, AMZN, NVDA via Yahoo Finance.
+- GET /api/market/signals
+- GET /api/market/preflight
+- GET /api/market/history
+- GET /api/market/decision
+- GET /api/market/audit
+- GET /api/market/forecast
+- GET /api/market/risk
+
+### 3. Apollo — Forex (port 8003)
+EURUSD, GBPUSD, USDJPY, USDCHF, AUDUSD, USDCAD, NZDUSD, EURGBP, EURJPY, GBPJPY via exchangerate-api.com.
+- GET /api/forex/signals
+- GET /api/forex/preflight
+- GET /api/forex/history
+- GET /api/forex/decision
+- GET /api/forex/audit
+- GET /api/forex/forecast
+- GET /api/forex/risk
+
+### 4. Pollux — Commodities (port 8004)
+Gold, Silver, Crude Oil, Natural Gas, Platinum, Copper, Corn, Soybeans, Wheat, Cotton via Yahoo Finance.
+- GET /api/commodities/signals
+- GET /api/commodities/preflight
+- GET /api/commodities/history
+- GET /api/commodities/decision
+- GET /api/commodities/audit
+- GET /api/commodities/forecast
+- GET /api/commodities/risk
+
+### 5. Dagon — On-Chain / DeFi (port 8005)
+ETH gas (Etherscan), BTC fees (mempool.space), DeFi TVL (DeFiLlama).
+- GET /api/onchain/signals
+- GET /api/onchain/preflight
+- GET /api/onchain/history
+- GET /api/onchain/decision
+- GET /api/onchain/audit
+- GET /api/onchain/forecast
+- GET /api/onchain/risk
+
+## MCP Server
+Install: npx atlasmarkets-mcp
+npm: atlasmarkets-mcp
+Wraps all five APIs as MCP tools for AI agents.
+Env: ATLASMARKETS_URL=https://your-deployment.railway.app
+
+## Payment
+x402 protocol, USDC on Base blockchain.
+AI agents include x402 headers — no API key required.
+Settlement handled by third-party facilitator (PayAI or x402.org/facilitator).
+Private keys never leave the wallet.
+
+## Response Format
+All responses include: ts (ISO 8601), data_freshness (FRESH/HISTORICAL), regime (bullish/bearish/chop).
+
+Decision responses include: decision_id (UUID), suggested_action, confidence (0.0–1.0), certainty (PROBABILISTIC), next_step (endpoint + cost).
+
+Forecast responses include: range_80 { lower, upper }, confidence (0.80), coverage_method (conformal).
+
+## Deployment
+Railway: https://railway.app
+Domain: atlasmarkets.[domain]
+Each API is a separate FastAPI service.
+
+## Human Contact
+AtlasMarkets by Max Sadikovic
