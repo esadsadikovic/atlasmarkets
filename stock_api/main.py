@@ -171,6 +171,19 @@ def signal_score(pct: float) -> float:
                 "type": "object"
             }
         },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "timeframe": {"type": "string", "description": "Timeframe: 15m, 1h, 4h, 1d", "example": "1h"}
+                        },
+                        "required": []
+                    }
+                }
+            }
+        }
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -205,6 +218,28 @@ def signals(timeframe: str = Query(..., description="Timeframe for signals (15m,
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.150000"},
             "protocols": [{"x402": {}}]
+        },
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL"}}, "required": []},
+                    "output": {"type": "object", "properties": {}}
+                },
+                "type": "object"
+            }
+        },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL"}
+                        },
+                        "required": []
+                    }
+                }
+            }
         }
     },
     responses={402: {"description": "Payment Required"}}
@@ -261,6 +296,20 @@ def decision(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, A
                 "type": "object"
             }
         },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "decision_id": {"type": "string", "description": "UUID from /decision endpoint", "example": "123e4567-e89b-12d3-a456-426614174000"},
+                            "window": {"type": "string", "description": "Evaluation window (1h, 4h, 24h)", "example": "1h"}
+                        },
+                        "required": ["decision_id"]
+                    }
+                }
+            }
+        }
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -305,6 +354,17 @@ def audit(decision_id: str = Query(...), window: str = Query("1h", description="
                 "type": "object"
             }
         },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL", "example": "SPY"}},
+                        "required": []
+                    }
+                }
+            }
+        }
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -350,6 +410,13 @@ def forecast(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, A
                 "type": "object"
             }
         },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {"type": "object", "properties": {}, "required": []}
+                }
+            }
+        }
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -407,6 +474,17 @@ _decision_log: list[dict] = []
                 "type": "object"
             }
         },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL", "example": "SPY"}},
+                        "required": []
+                    }
+                }
+            }
+        }
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -458,6 +536,20 @@ def preflight(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, 
                 "type": "object"
             }
         },
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL", "example": "SPY"},
+                            "limit": {"type": "integer", "description": "Number of records to return", "example": 10}
+                        },
+                        "required": []
+                    }
+                }
+            }
+        }
     },
     responses={402: {"description": "Payment Required"}}
 )
