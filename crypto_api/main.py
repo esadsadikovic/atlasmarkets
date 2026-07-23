@@ -182,19 +182,15 @@ def signal_score(pct_24h: float) -> float:
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "requestBody": {
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "timeframe": {"type": "string", "description": "Timeframe for signals (15m, 1h, 4h, 1d)", "example": "1h"}
-                        },
-                        "required": []
-                    }
-                }
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Timeframe: 15m, 1h, 4h, 1d", "example": "1h"}}, "required": []},
+                    "output": {"type": "object", "properties": {}}
+                },
+                "type": "object"
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -274,20 +270,15 @@ def decision(symbol: str = Query(..., description="Crypto symbol e.g. BTC, ETH")
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"},
             "protocols": [{"x402": {}}]
         },
-        "requestBody": {
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string", "description": "Decision UUID from /decision endpoint", "example": "123e4567-e89b-12d3-a456-426614174000"},
-                            "window": {"type": "string", "description": "Evaluation window (1h, 4h, 24h)", "example": "1h"}
-                        },
-                        "required": []
-                    }
-                }
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {"type": "object", "properties": {"decision_id": {"type": "string", "description": "UUID from /decision endpoint"}, "window": {"type": "string", "description": "Evaluation window: 1h, 4h, 24h", "example": "1h"}}, "required": ["decision_id"]},
+                    "output": {"type": "object", "properties": {}}
+                },
+                "type": "object"
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -324,19 +315,15 @@ def audit(decision_id: str = Query(..., description="Decision UUID from /decisio
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "requestBody": {
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"}
-                        },
-                        "required": []
-                    }
-                }
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"}}, "required": []},
+                    "output": {"type": "object", "properties": {}}
+                },
+                "type": "object"
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -372,13 +359,15 @@ def forecast(symbol: str = Query(..., description="Asset symbol (e.g. BTC, ETH)"
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"},
             "protocols": [{"x402": {}}]
         },
-        "requestBody": {
-            "content": {
-                "application/json": {
-                    "schema": {"type": "object", "properties": {}, "required": []}
-                }
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {"type": "object", "properties": {}, "required": []},
+                    "output": {"type": "object", "properties": {}}
+                },
+                "type": "object"
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -427,19 +416,15 @@ _decision_log: list[dict] = []
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "requestBody": {
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"}
-                        },
-                        "required": []
-                    }
-                }
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"}}, "required": []},
+                    "output": {"type": "object", "properties": {}}
+                },
+                "type": "object"
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
@@ -482,20 +467,15 @@ def preflight(symbol: str = Query(..., description="Asset symbol (e.g. BTC, ETH)
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
             "protocols": [{"x402": {}}]
         },
-        "requestBody": {
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"},
-                            "limit": {"type": "integer", "description": "Number of recent records to return", "example": 10}
-                        },
-                        "required": []
-                    }
-                }
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Asset symbol (e.g. BTC, ETH)", "example": "BTC"}, "limit": {"type": "integer", "description": "Number of records to return", "example": 10}}, "required": []},
+                    "output": {"type": "object", "properties": {}}
+                },
+                "type": "object"
             }
-        }
+        },
     },
     responses={402: {"description": "Payment Required"}}
 )
