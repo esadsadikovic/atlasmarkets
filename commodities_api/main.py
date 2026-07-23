@@ -278,7 +278,7 @@ def audit(decision_id: str, window: str = "1d"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def forecast(symbol: str = "Gold (XAU/USD)"):
+def forecast(symbol: str = Query(..., description="Commodity (XAU, XAG, WTI, NG, HG)", example="XAU")):
     """Pollux Forecast — 80% calibrated commodity range."""
     sym = symbol
     data = get_all_commodities()
@@ -335,11 +335,7 @@ def risk():
     )
 
 
-@app.get("/health",
-    openapi_extra={
-        "security": []
-    }
-)
+@app.get("/health", security=[])
 def health():
     return {"status": "ok", "service": "atlasmarkets-pollux", "version": "1.0.0"}
 
@@ -356,7 +352,7 @@ _decision_log: list[dict] = []
     },
     responses={402: {"description": "Payment Required"}}
 )
-def preflight(symbol: str = "Gold (XAU/USD)"):
+def preflight(symbol: str = Query(..., description="Commodity (XAU, XAG, WTI, NG, HG)", example="XAU")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol
     data = get_all_commodities()

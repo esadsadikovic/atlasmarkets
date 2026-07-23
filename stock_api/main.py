@@ -281,7 +281,7 @@ def audit(decision_id: str, window: str = "1d"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def forecast(symbol: str = "SPY"):
+def forecast(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, AAPL", example="SPY")):
     """Viking Forecast — conformally-calibrated 80% price range."""
     sym = symbol.upper()
     q = get_stock_quote(sym)
@@ -348,11 +348,7 @@ def risk():
 
 # ─── Health ──────────────────────────────────────────────────────────────────
 
-@app.get("/health",
-    openapi_extra={
-        "security": []
-    }
-)
+@app.get("/health", security=[])
 def health():
     return {"status": "ok", "service": "atlasmarkets-viking", "version": "1.0.0"}
 
@@ -369,7 +365,7 @@ _decision_log: list[dict] = []
     },
     responses={402: {"description": "Payment Required"}}
 )
-def preflight(symbol: str = "SPY"):
+def preflight(symbol: str = Query(..., description="Stock ticker e.g. SPY, QQQ, AAPL", example="SPY")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     q = get_stock_quote(sym)

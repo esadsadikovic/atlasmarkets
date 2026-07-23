@@ -320,7 +320,7 @@ def audit(decision_id: str = Query(..., description="Decision UUID from /decisio
     },
     responses={402: {"description": "Payment Required"}}
 )
-def forecast(symbol: str = "ETH"):
+def forecast(symbol: str = Query(..., description="ETH or BTC", example="ETH")):
     """Dagon Forecast — expected gas range over next 1h."""
     gas = get_eth_gas()
     gwei = gas["propose_gwei"]
@@ -381,11 +381,7 @@ def risk():
     )
 
 
-@app.get("/health",
-    openapi_extra={
-        "security": []
-    }
-)
+@app.get("/health", security=[])
 def health():
     return {"status": "ok", "service": "atlasmarkets-dagon", "version": "1.0.0"}
 
@@ -402,7 +398,7 @@ _decision_log: list[dict] = []
     },
     responses={402: {"description": "Payment Required"}}
 )
-def preflight(symbol: str = "ETH"):
+def preflight(symbol: str = Query(..., description="ETH or BTC", example="ETH")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     gas = get_eth_gas()

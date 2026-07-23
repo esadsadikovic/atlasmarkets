@@ -277,7 +277,7 @@ def audit(decision_id: str, window: str = "4h"):
     },
     responses={402: {"description": "Payment Required"}}
 )
-def forecast(symbol: str = "EURUSD"):
+def forecast(symbol: str = Query(..., description="Forex pair e.g. EURUSD, GBPUSD, USDJPY", example="EURUSD")):
     """Apollo Forecast — 80% calibrated forex range."""
     sym = symbol.upper()
     signals = get_forex_signals()
@@ -328,11 +328,7 @@ def risk():
     )
 
 
-@app.get("/health",
-    openapi_extra={
-        "security": []
-    }
-)
+@app.get("/health", security=[])
 def health():
     return {"status": "ok", "service": "atlasmarkets-apollo", "version": "1.0.0"}
 
@@ -349,7 +345,7 @@ _decision_log: list[dict] = []
     },
     responses={402: {"description": "Payment Required"}}
 )
-def preflight(symbol: str = "EURUSD"):
+def preflight(symbol: str = Query(..., description="Forex pair e.g. EURUSD, GBPUSD, USDJPY", example="EURUSD")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     signals = get_forex_signals()
