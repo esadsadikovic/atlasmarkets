@@ -19,7 +19,24 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 
-app = FastAPI(title="AtlasMarkets — Pollux", version="1.0.0")
+app = FastAPI(
+    title="AtlasMarkets — Pollux",
+    version="1.0.0",
+    openapi_extra={
+        "x-agentcash-provenance": {
+            "ownershipProofs": [
+                "d5299c94df61f692f8b778c964348de932f192c43bcaf5ec8757c206ea926d400cd421daacc73ead49370897e0d593e23a1aa46299ab1dad747c575da31b2f3e1c",
+                "89f89072a0260fe47bd2e65450e6032cb74c247c1f8667b2a43c5c9b07d0dbcf647a9deef60570e5da312c649b3f93359340bdf249cbfda01e41116851c756e21b",
+                "f0fa23832316e244b1524ac9de2bc94ae21aadf46a3c9c2565af6dfe9e55acb3431f43fc673dd8162d0bd5f38cb7b594144f0d04498d421c261e0bb65cf53b8d1b",
+                "d9b9b997a3f0ebb605015f091009cff80eeff8d8078eb13a0431692f89f0dfb87f8c96b5dcb0769f7923d62bb98ee795c0caa8f7f476955f377b9d6e828189341c",
+                "d6ec3f51dbebbb6c945e65d6de81f665c32fef26b8761b9bd961cc77519103f05e9d9bdbf356d2d47af2b5edbcfe68c3b38c64621ea77d059fc734d5a041ea2f1b",
+            ]
+        },
+        "x-agentcash-guidance": {
+            "llmsTxtUrl": "https://x402scan.com/atlasmarkets/llms.txt"
+        },
+    },
+)
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
