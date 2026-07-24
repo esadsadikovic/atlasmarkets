@@ -225,10 +225,31 @@ def signal_score(pct: float) -> float:
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}],
-        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
+            "protocols": [{"x402": {}}]
         },
-        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {
+                        "type": "object",
+                        "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d, 4h"}}
+                    },
+                    "output": {
+                        "type": "object",
+                        "properties": {
+                            "ts": {"type": "string"},
+                            "timeframe": {"type": "string"},
+                            "regime": {"type": "string"},
+                            "signals": {"type": "object"},
+                            "top_k": {"type": "array", "items": {"type": "string"}},
+                            "signal_age_hours": {"type": "number"},
+                            "data_freshness": {"type": "string"}
+                        }
+                    }
+                }
+            }
+        },
+        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "4h"}}],
     },
     responses={
         "200": {
@@ -263,11 +284,63 @@ def signals(timeframe: str = "4h"):
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.150000"},
-            "protocols": [{"x402": {}}],
-        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
+            "protocols": [{"x402": {}}]
+        },
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {
+                        "type": "object",
+                        "properties": {"symbol": {"type": "string", "description": "Forex pair e.g. EURUSD, GBPUSD, USDJPY"}},
+                        "required": ["symbol"]
+                    },
+                    "output": {
+                        "type": "object",
+                        "properties": {
+                            "decision_id": {"type": "string"},
+                            "symbol": {"type": "string"},
+                            "suggested_action": {"type": "string"},
+                            "confidence": {"type": "number"},
+                            "certainty": {"type": "string"},
+                            "directional_edge": {"type": "string"},
+                            "raw_signal": {"type": "number"},
+                            "regime": {"type": "string"},
+                            "risk_level": {"type": "string"},
+                            "data_freshness": {"type": "string"},
+                            "next_step": {"type": "object"}
+                        }
+                    }
+                }
+            }
         }
     },
-    responses={402: {"description": "Payment Required"}}
+    responses={
+        "200": {
+            "description": "Decision outcome",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "decision_id": {"type": "string"},
+                            "symbol": {"type": "string"},
+                            "suggested_action": {"type": "string"},
+                            "confidence": {"type": "number"},
+                            "certainty": {"type": "string"},
+                            "directional_edge": {"type": "string"},
+                            "raw_signal": {"type": "number"},
+                            "regime": {"type": "string"},
+                            "risk_level": {"type": "string"},
+                            "data_freshness": {"type": "string"},
+                            "next_step": {"type": "object"}
+                        },
+                        "additionalProperties": False
+                    }
+                }
+            }
+        },
+        "402": {"description": "Payment Required"}
+    }
 )
 def decision(symbol: str = Query(default="EURUSD", description="Forex pair e.g. EURUSD, GBPUSD, USDJPY")):
     """Apollo Decision — BUY / SELL / HOLD for forex pair."""
@@ -306,17 +379,57 @@ def decision(symbol: str = Query(default="EURUSD", description="Forex pair e.g. 
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"},
-            "protocols": [{"x402": {}}],
-        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
+            "protocols": [{"x402": {}}]
         },
-        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {
+                        "type": "object",
+                        "properties": {
+                            "decision_id": {"type": "string", "description": "Decision ID to audit"},
+                            "window": {"type": "string", "description": "Evaluation window e.g. 1h"}
+                        },
+                        "required": ["decision_id"]
+                    },
+                    "output": {
+                        "type": "object",
+                        "properties": {
+                            "decision_id": {"type": "string"},
+                            "symbol": {"type": "string"},
+                            "suggested_action": {"type": "string"},
+                            "confidence": {"type": "number"},
+                            "evaluation_window": {"type": "string"},
+                            "prices": {"type": "object"},
+                            "outcome": {"type": "object"}
+                        }
+                    }
+                }
+            }
+        },
+        "parameters": [
+            {"name": "decision_id", "in": "query", "required": True, "schema": {"type": "string"}},
+            {"name": "window", "in": "query", "required": False, "schema": {"type": "string", "default": "1h"}}
+        ],
     },
     responses={
         "200": {
             "description": "Successful response",
             "content": {
                 "application/json": {
-                    "schema": {"type": "object", "properties": {"decision_id": {"type": "string"}, "symbol": {"type": "string"}, "suggested_action": {"type": "string"}, "confidence": {"type": "number"}, "evaluation_window": {"type": "string"}, "prices": {"type": "object", "properties": {"entry": {"type": "number"}, "exit": {"type": "number"}}}, "outcome": {"type": "object", "properties": {"pnl_pct": {"type": "number"}, "direction_correct": {"type": "boolean"}, "verdict": {"type": "string"}}}}, "additionalProperties": False}
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "decision_id": {"type": "string"},
+                            "symbol": {"type": "string"},
+                            "suggested_action": {"type": "string"},
+                            "confidence": {"type": "number"},
+                            "evaluation_window": {"type": "string"},
+                            "prices": {"type": "object"},
+                            "outcome": {"type": "object"}
+                        },
+                        "additionalProperties": False
+                    }
                 }
             }
         },
@@ -348,17 +461,46 @@ def audit(decision_id: str, window: str = "4h"):
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}],
-        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
+            "protocols": [{"x402": {}}]
         },
-        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {
+                        "type": "object",
+                        "properties": {"symbol": {"type": "string", "description": "Forex pair e.g. EURUSD, GBPUSD"}}
+                    },
+                    "output": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string"},
+                            "ts": {"type": "string"},
+                            "regime": {"type": "string"},
+                            "forecast": {"type": "object"},
+                            "data_freshness": {"type": "string"}
+                        }
+                    }
+                }
+            }
+        },
+        "parameters": [{"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "EURUSD"}}],
     },
     responses={
         "200": {
             "description": "Successful response",
             "content": {
                 "application/json": {
-                    "schema": {"type": "object", "properties": {"symbol": {"type": "string"}, "ts": {"type": "string"}, "regime": {"type": "string"}, "forecast": {"type": "object", "properties": {"range_80": {"type": "object", "properties": {"lower": {"type": "number"}, "upper": {"type": "number"}}}, "mid": {"type": "number"}, "confidence": {"type": "string"}, "coverage_method": {"type": "string"}}}, "data_freshness": {"type": "string"}}, "additionalProperties": False}
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string"},
+                            "ts": {"type": "string"},
+                            "regime": {"type": "string"},
+                            "forecast": {"type": "object"},
+                            "data_freshness": {"type": "string"}
+                        },
+                        "additionalProperties": False
+                    }
                 }
             }
         },
@@ -392,17 +534,44 @@ def forecast(symbol: str = "EURUSD"):
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"},
-            "protocols": [{"x402": {}}],
-        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
+            "protocols": [{"x402": {}}]
         },
-        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {"type": "object", "properties": {}},
+                    "output": {
+                        "type": "object",
+                        "properties": {
+                            "ts": {"type": "string"},
+                            "regime": {"type": "string"},
+                            "risk_level": {"type": "string"},
+                            "risk_factors": {"type": "array", "items": {"type": "string"}},
+                            "cooldown_active": {"type": "boolean"},
+                            "data_freshness": {"type": "string"}
+                        }
+                    }
+                }
+            }
+        },
     },
     responses={
         "200": {
             "description": "Successful response",
             "content": {
                 "application/json": {
-                    "schema": {"type": "object", "properties": {"ts": {"type": "string"}, "regime": {"type": "string"}, "risk_level": {"type": "string"}, "risk_factors": {"type": "array", "items": {"type": "string"}}, "cooldown_active": {"type": "boolean"}, "data_freshness": {"type": "string"}}, "additionalProperties": False}
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "ts": {"type": "string"},
+                            "regime": {"type": "string"},
+                            "risk_level": {"type": "string"},
+                            "risk_factors": {"type": "array", "items": {"type": "string"}},
+                            "cooldown_active": {"type": "boolean"},
+                            "data_freshness": {"type": "string"}
+                        },
+                        "additionalProperties": False
+                    }
                 }
             }
         },
@@ -440,17 +609,54 @@ _decision_log: list[dict] = []
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}],
-        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
+            "protocols": [{"x402": {}}]
         },
-        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {
+                        "type": "object",
+                        "properties": {"symbol": {"type": "string", "description": "Forex pair e.g. EURUSD"}}
+                    },
+                    "output": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string"},
+                            "ts": {"type": "string"},
+                            "can_decide": {"type": "boolean"},
+                            "cooldown_active": {"type": "boolean"},
+                            "market_state": {"type": "string"},
+                            "price": {"type": "number"},
+                            "volatility": {"type": "string"},
+                            "warnings": {"type": "array", "items": {"type": "string"}},
+                            "data_freshness": {"type": "string"}
+                        }
+                    }
+                }
+            }
+        },
+        "parameters": [{"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "EURUSD"}}],
     },
     responses={
         "200": {
             "description": "Successful response",
             "content": {
                 "application/json": {
-                    "schema": {"type": "object", "properties": {"symbol": {"type": "string"}, "ts": {"type": "string"}, "can_decide": {"type": "boolean"}, "cooldown_active": {"type": "boolean"}, "market_state": {"type": "string"}, "price": {"type": "number"}, "volatility": {"type": "string"}, "warnings": {"type": "array", "items": {"type": "string"}}, "data_freshness": {"type": "string"}}, "additionalProperties": False}
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string"},
+                            "ts": {"type": "string"},
+                            "can_decide": {"type": "boolean"},
+                            "cooldown_active": {"type": "boolean"},
+                            "market_state": {"type": "string"},
+                            "price": {"type": "number"},
+                            "volatility": {"type": "string"},
+                            "warnings": {"type": "array", "items": {"type": "string"}},
+                            "data_freshness": {"type": "string"}
+                        },
+                        "additionalProperties": False
+                    }
                 }
             }
         },
@@ -495,17 +701,50 @@ def preflight(symbol: str = "EURUSD"):
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}],
-        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
+            "protocols": [{"x402": {}}]
         },
-        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
+        "x-bazaar": {
+            "schema": {
+                "properties": {
+                    "input": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string", "description": "Forex pair e.g. EURUSD"},
+                            "limit": {"type": "integer", "description": "Max entries"}
+                        }
+                    },
+                    "output": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string"},
+                            "count": {"type": "integer"},
+                            "history": {"type": "array"},
+                            "data_freshness": {"type": "string"}
+                        }
+                    }
+                }
+            }
+        },
+        "parameters": [
+            {"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "EURUSD"}},
+            {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "default": 10}}
+        ],
     },
     responses={
         "200": {
             "description": "Successful response",
             "content": {
                 "application/json": {
-                    "schema": {"type": "object", "properties": {"symbol": {"type": "string"}, "count": {"type": "integer"}, "history": {"type": "array"}, "data_freshness": {"type": "string"}}, "additionalProperties": False}
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "symbol": {"type": "string"},
+                            "count": {"type": "integer"},
+                            "history": {"type": "array"},
+                            "data_freshness": {"type": "string"}
+                        },
+                        "additionalProperties": False
+                    }
                 }
             }
         },
