@@ -1,8 +1,6 @@
 services:
   - type: web
     name: atlasmarkets-anubis
-    env: docker
-    rootDir: crypto_api
     dockerfilePath: crypto_api/Dockerfile
     plan: free
     healthCheckPath: /health
@@ -14,8 +12,6 @@ services:
 
   - type: web
     name: atlasmarkets-viking
-    env: docker
-    rootDir: stock_api
     dockerfilePath: stock_api/Dockerfile
     plan: free
     healthCheckPath: /health
@@ -27,8 +23,6 @@ services:
 
   - type: web
     name: atlasmarkets-apollo
-    env: docker
-    rootDir: forex_api
     dockerfilePath: forex_api/Dockerfile
     plan: free
     healthCheckPath: /health
@@ -40,8 +34,6 @@ services:
 
   - type: web
     name: atlasmarkets-pollux
-    env: docker
-    rootDir: commodities_api
     dockerfilePath: commodities_api/Dockerfile
     plan: free
     healthCheckPath: /health
@@ -53,8 +45,6 @@ services:
 
   - type: web
     name: atlasmarkets-dagon
-    env: docker
-    rootDir: onchain_api
     dockerfilePath: onchain_api/Dockerfile
     plan: free
     healthCheckPath: /health
