@@ -230,7 +230,7 @@ def signal_score(pct: float) -> float:
                 "application/json": {
                     "schema": {
                         "type": "object",
-                         "properties": {}, "additionalProperties": false,
+                         "properties": {}, "additionalProperties": False,
                         "additionalProperties": False
                     }
                 }
@@ -310,7 +310,7 @@ def decision(symbol: str = Query(default="EURUSD", description="Forex pair e.g. 
                 "application/json": {
                     "schema": {
                         "type": "object",
-                         "properties": {}, "additionalProperties": false,
+                         "properties": {}, "additionalProperties": False,
                         "additionalProperties": False
                     }
                 }
@@ -352,7 +352,7 @@ def audit(decision_id: str, window: str = "4h"):
                 "application/json": {
                     "schema": {
                         "type": "object",
-                         "properties": {}, "additionalProperties": false,
+                         "properties": {}, "additionalProperties": False,
                         "additionalProperties": False
                     }
                 }
@@ -396,7 +396,7 @@ def forecast(symbol: str = "EURUSD"):
                 "application/json": {
                     "schema": {
                         "type": "object",
-                         "properties": {}, "additionalProperties": false,
+                         "properties": {}, "additionalProperties": False,
                         "additionalProperties": False
                     }
                 }
@@ -444,7 +444,7 @@ _decision_log: list[dict] = []
                 "application/json": {
                     "schema": {
                         "type": "object",
-                         "properties": {}, "additionalProperties": false,
+                         "properties": {}, "additionalProperties": False,
                         "additionalProperties": False
                     }
                 }
@@ -499,7 +499,7 @@ def preflight(symbol: str = "EURUSD"):
                 "application/json": {
                     "schema": {
                         "type": "object",
-                         "properties": {}, "additionalProperties": false,
+                         "properties": {}, "additionalProperties": False,
                         "additionalProperties": False
                     }
                 }
