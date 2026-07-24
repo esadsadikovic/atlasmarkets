@@ -228,7 +228,7 @@ def signal_score(pct: float) -> float:
                 }
             }
         },
-        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "1d"}}],
+        "parameters": [{"name": "timeframe", "in": "query", "required": False, "schema": {"type": "string", "default": "1d"}}],
     },
     responses={
         "200": {
@@ -413,7 +413,7 @@ def decision(symbol: str = Query(default="SPY", description="Stock ticker e.g. S
         },
         "parameters": [
             {"name": "decision_id", "in": "query", "required": true, "schema": {"type": "string"}},
-            {"name": "window", "in": "query", "required": false, "schema": {"type": "string", "default": "1h"}}
+            {"name": "window", "in": "query", "required": False, "schema": {"type": "string", "default": "1h"}}
         ],
     },
     responses={
@@ -492,7 +492,7 @@ def audit(decision_id: str, window: str = "1d"):
                 }
             }
         },
-        "parameters": [{"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "SPY"}}],
+        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "SPY"}}],
     },
     responses={
         "200": {
@@ -660,7 +660,7 @@ _decision_log: list[dict] = []
                 }
             }
         },
-        "parameters": [{"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "SPY"}}],
+        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "SPY"}}],
     },
     responses={
         "200": {
@@ -750,8 +750,8 @@ def preflight(symbol: str = "SPY"):
             }
         },
         "parameters": [
-            {"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "SPY"}},
-            {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "default": 10}}
+            {"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "SPY"}},
+            {"name": "limit", "in": "query", "required": False, "schema": {"type": "integer", "default": 10}}
         ],
     },
     responses={

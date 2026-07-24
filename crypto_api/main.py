@@ -255,7 +255,7 @@ def signal_score(pct_24h: float) -> float:
                 }
             }
         },
-        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
+        "parameters": [{"name": "timeframe", "in": "query", "required": False, "schema": {"type": "string", "default": "15m"}}],
     },
     responses={
         "200": {
@@ -506,7 +506,7 @@ def audit(decision_id: str, window: str = "1h"):
                 }
             }
         },
-        "parameters": [{"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "BTC"}}],
+        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "BTC"}}],
     },
     responses={
         "200": {
@@ -676,7 +676,7 @@ _decision_log: list[dict] = []
                 }
             }
         },
-        "parameters": [{"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "BTC"}}],
+        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "BTC"}}],
     },
     responses={
         "200": {
@@ -766,8 +766,8 @@ def preflight(symbol: str = "BTC"):
             }
         },
         "parameters": [
-            {"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "BTC"}},
-            {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "default": 10}}
+            {"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "BTC"}},
+            {"name": "limit", "in": "query", "required": False, "schema": {"type": "integer", "default": 10}}
         ],
     },
     responses={

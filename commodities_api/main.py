@@ -244,7 +244,7 @@ def signal_score(pct: float) -> float:
                 }
             }
         },
-        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "1d"}}],
+        "parameters": [{"name": "timeframe", "in": "query", "required": False, "schema": {"type": "string", "default": "1d"}}],
     },
     responses={
         "200": {
@@ -490,7 +490,7 @@ def audit(decision_id: str, window: str = "1d"):
                 }
             }
         },
-        "parameters": [{"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "Gold (XAU/USD)"}}],
+        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "Gold (XAU/USD)"}}],
     },
     responses={
         "200": {
@@ -648,7 +648,7 @@ _decision_log: list[dict] = []
                 }
             }
         },
-        "parameters": [{"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "Gold (XAU/USD)"}}],
+        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "Gold (XAU/USD)"}}],
     },
     responses={
         "200": {
@@ -741,8 +741,8 @@ def preflight(symbol: str = "Gold (XAU/USD)"):
             }
         },
         "parameters": [
-            {"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "Gold (XAU/USD)"}},
-            {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "default": 10}}
+            {"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "Gold (XAU/USD)"}},
+            {"name": "limit", "in": "query", "required": False, "schema": {"type": "integer", "default": 10}}
         ],
     },
     responses={

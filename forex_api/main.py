@@ -249,7 +249,7 @@ def signal_score(pct: float) -> float:
                 }
             }
         },
-        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "4h"}}],
+        "parameters": [{"name": "timeframe", "in": "query", "required": False, "schema": {"type": "string", "default": "4h"}}],
     },
     responses={
         "200": {
@@ -483,7 +483,7 @@ def audit(decision_id: str, window: str = "4h"):
                 }
             }
         },
-        "parameters": [{"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "EURUSD"}}],
+        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "EURUSD"}}],
     },
     responses={
         "200": {
@@ -635,7 +635,7 @@ _decision_log: list[dict] = []
                 }
             }
         },
-        "parameters": [{"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "EURUSD"}}],
+        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "EURUSD"}}],
     },
     responses={
         "200": {
@@ -726,8 +726,8 @@ def preflight(symbol: str = "EURUSD"):
             }
         },
         "parameters": [
-            {"name": "symbol", "in": "query", "required": false, "schema": {"type": "string", "default": "EURUSD"}},
-            {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "default": 10}}
+            {"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "EURUSD"}},
+            {"name": "limit", "in": "query", "required": False, "schema": {"type": "integer", "default": 10}}
         ],
     },
     responses={
