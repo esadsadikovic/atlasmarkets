@@ -18,6 +18,8 @@ from x402.http.middleware.fastapi import payment_middleware
 from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
+from x402.extensions.bazaar import bazaar_resource_server_extension
+from x402.extensions.bazaar import bazaar_resource_server_extension
 
 app = FastAPI(
     title="AtlasMarkets — Dagon",
@@ -65,12 +67,13 @@ app.openapi = _patched_openapi
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
-FACILITATOR_URL = os.environ.get("FACILITATOR_URL", "https://facilitator.payai.network")
+FACILITATOR_URL = "https://api.cdp.coinbase.com/platform/v2/x402"
 NETWORK = "eip155:8453"
 
 _facilitator = HTTPFacilitatorClient({"url": FACILITATOR_URL})
 _x402_server = server.x402ResourceServer(_facilitator)
 _x402_server.register(NETWORK, ExactEvmServerScheme())
+_x402_server.register_extension(bazaar_resource_server_extension)
 
 _ROUTES = {
     f"/api/dagon/{ep}": {
@@ -254,20 +257,10 @@ def signal_score(gwei: float) -> float:
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
+            "protocols": [{"x402": {}}],
+        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
         },
-        "requestBody": {
-            "required": False,
-            "content": {
-                "application/json": {
-                    "schema": {
-                            "type": "object",
-                            "properties": {},
-                            "additionalProperties": False
-                        }
-                }
-            }
-        },
+        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
     },
     responses={
         "200": {
@@ -310,7 +303,8 @@ def signals(timeframe: str = "15m"):
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.150000"},
-            "protocols": [{"x402": {}}]
+            "protocols": [{"x402": {}}],
+        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
         }
     },
     responses={402: {"description": "Payment Required"}}
@@ -350,20 +344,10 @@ def decision(symbol: str = Query(default="ETH", description="ETH or BTC")):
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"},
-            "protocols": [{"x402": {}}]
+            "protocols": [{"x402": {}}],
+        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
         },
-        "requestBody": {
-            "required": False,
-            "content": {
-                "application/json": {
-                    "schema": {
-                            "type": "object",
-                            "properties": {},
-                            "additionalProperties": False
-                        }
-                }
-            }
-        },
+        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
     },
     responses={
         "200": {
@@ -401,20 +385,10 @@ def audit(decision_id: str, window: str = "1h"):
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
+            "protocols": [{"x402": {}}],
+        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
         },
-        "requestBody": {
-            "required": False,
-            "content": {
-                "application/json": {
-                    "schema": {
-                            "type": "object",
-                            "properties": {},
-                            "additionalProperties": False
-                        }
-                }
-            }
-        },
+        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
     },
     responses={
         "200": {
@@ -454,20 +428,10 @@ def forecast(symbol: str = "ETH"):
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"},
-            "protocols": [{"x402": {}}]
+            "protocols": [{"x402": {}}],
+        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
         },
-        "requestBody": {
-            "required": False,
-            "content": {
-                "application/json": {
-                    "schema": {
-                            "type": "object",
-                            "properties": {},
-                            "additionalProperties": False
-                        }
-                }
-            }
-        },
+        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
     },
     responses={
         "200": {
@@ -523,20 +487,10 @@ _decision_log: list[dict] = []
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
+            "protocols": [{"x402": {}}],
+        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
         },
-        "requestBody": {
-            "required": False,
-            "content": {
-                "application/json": {
-                    "schema": {
-                            "type": "object",
-                            "properties": {},
-                            "additionalProperties": False
-                        }
-                }
-            }
-        },
+        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
     },
     responses={
         "200": {
@@ -586,20 +540,10 @@ def preflight(symbol: str = "ETH"):
     openapi_extra={
         "x-payment-info": {
             "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
+            "protocols": [{"x402": {}}],
+        "x-bazaar": {"schema": {"properties": {"input": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}}, "output": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}}}}}
         },
-        "requestBody": {
-            "required": False,
-            "content": {
-                "application/json": {
-                    "schema": {
-                            "type": "object",
-                            "properties": {},
-                            "additionalProperties": False
-                        }
-                }
-            }
-        },
+        "parameters": [{"name": "timeframe", "in": "query", "required": false, "schema": {"type": "string", "default": "15m"}}],
     },
     responses={
         "200": {
