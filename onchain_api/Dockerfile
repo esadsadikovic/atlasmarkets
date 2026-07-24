@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-RUN pip install --upgrade pip && pip install "x402[evm]>=2.16.0" httpx
+RUN pip install --upgrade pip && pip install "x402[evm]>=2.16.0" fastapi uvicorn httpx
 
 COPY . .
 
