@@ -432,7 +432,7 @@ def decision(symbol: str = Query(default="SPY", description="Stock ticker e.g. S
                             "prices": {"type": "object"},
                             "outcome": {"type": "object"}
                         },
-                        "additionalProperties": false
+                        "additionalProperties": False
                     }
                 }
             }
