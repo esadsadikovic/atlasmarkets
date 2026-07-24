@@ -424,7 +424,7 @@ def risk():
     )
 
 
-@app.get("/health")
+@app.get("/health", security=[])
 def health():
     return {"status": "ok", "service": "atlasmarkets-apollo", "version": "1.0.0"}
 

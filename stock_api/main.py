@@ -438,7 +438,7 @@ def risk():
 
 # ─── Health ──────────────────────────────────────────────────────────────────
 
-@app.get("/health")
+@app.get("/health", security=[])
 def health():
     return {"status": "ok", "service": "atlasmarkets-viking", "version": "1.0.0"}
 
