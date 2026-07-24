@@ -51,7 +51,7 @@ def _patched_openapi():
     schema["x-x402"] = {
         "network": "eip155:8453",
         "payTo": "0x8eB96caA976De43027FEf619c4D24F6679486277",
-        "facilitator": "https://facilitator.pantai.network",
+        "facilitator": "https://x402.xyz/facilitate",
         "extensions": {
             "bazaar": {
                 "status": "live",
@@ -65,7 +65,7 @@ app.openapi = _patched_openapi
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
-FACILITATOR_URL = os.environ.get("FACILITATOR_URL", "https://facilitator.pantai.network")
+FACILITATOR_URL = os.environ.get("FACILITATOR_URL", "https://x402.xyz/facilitate")
 NETWORK = "eip155:8453"
 
 _facilitator = HTTPFacilitatorClient({"url": FACILITATOR_URL})
