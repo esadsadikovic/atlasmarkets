@@ -236,10 +236,10 @@ def signal_score(pct_24h: float) -> float:
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -327,10 +327,10 @@ def decision(symbol: str = Query(default="BTC", description="Crypto symbol e.g. 
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -375,10 +375,10 @@ def audit(decision_id: str, window: str = "1h"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -422,10 +422,10 @@ def forecast(symbol: str = "BTC"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -482,10 +482,10 @@ _decision_log: list[dict] = []
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -536,10 +536,10 @@ def preflight(symbol: str = "BTC"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },

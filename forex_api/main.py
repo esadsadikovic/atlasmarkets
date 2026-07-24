@@ -229,10 +229,10 @@ def signal_score(pct: float) -> float:
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -309,10 +309,10 @@ def decision(symbol: str = Query(default="EURUSD", description="Forex pair e.g. 
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -351,10 +351,10 @@ def audit(decision_id: str, window: str = "4h"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -395,10 +395,10 @@ def forecast(symbol: str = "EURUSD"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -443,10 +443,10 @@ _decision_log: list[dict] = []
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -498,10 +498,10 @@ def preflight(symbol: str = "EURUSD"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },

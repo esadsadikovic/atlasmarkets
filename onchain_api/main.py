@@ -261,10 +261,10 @@ def signal_score(gwei: float) -> float:
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -347,10 +347,10 @@ def decision(symbol: str = Query(default="ETH", description="ETH or BTC")):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -388,10 +388,10 @@ def audit(decision_id: str, window: str = "1h"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -431,10 +431,10 @@ def forecast(symbol: str = "ETH"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -490,10 +490,10 @@ _decision_log: list[dict] = []
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -543,10 +543,10 @@ def preflight(symbol: str = "ETH"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },

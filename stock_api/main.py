@@ -209,10 +209,10 @@ def signal_score(pct: float) -> float:
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -302,10 +302,10 @@ def decision(symbol: str = Query(default="SPY", description="Stock ticker e.g. S
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -349,10 +349,10 @@ def audit(decision_id: str, window: str = "1d"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -397,10 +397,10 @@ def forecast(symbol: str = "SPY"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -457,10 +457,10 @@ _decision_log: list[dict] = []
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -511,10 +511,10 @@ def preflight(symbol: str = "SPY"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },

@@ -224,10 +224,10 @@ def signal_score(pct: float) -> float:
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -304,10 +304,10 @@ def decision(symbol: str = Query(default="Gold (XAU/USD)", description="Commodit
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -346,10 +346,10 @@ def audit(decision_id: str, window: str = "1d"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -390,10 +390,10 @@ def forecast(symbol: str = "Gold (XAU/USD)"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -444,10 +444,10 @@ _decision_log: list[dict] = []
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
@@ -501,10 +501,10 @@ def preflight(symbol: str = "Gold (XAU/USD)"):
             "content": {
                 "application/json": {
                     "schema": {
-                        "type": "object",
-                         "properties": {}, "additionalProperties": False,
-                        "additionalProperties": False
-                    }
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": False
+                        }
                 }
             }
         },
