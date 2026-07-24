@@ -412,7 +412,7 @@ def decision(symbol: str = Query(default="SPY", description="Stock ticker e.g. S
             }
         },
         "parameters": [
-            {"name": "decision_id", "in": "query", "required": true, "schema": {"type": "string"}},
+            {"name": "decision_id", "in": "query", "required": True, "schema": {"type": "string"}},
             {"name": "window", "in": "query", "required": False, "schema": {"type": "string", "default": "1h"}}
         ],
     },
