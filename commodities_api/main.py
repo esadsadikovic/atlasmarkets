@@ -232,7 +232,17 @@ def signal_score(pct: float) -> float:
             }
         },
     },
-    responses={402: {"description": "Payment Required"}}
+    responses={
+        "200": {
+            "description": "Successful response",
+            "content": {
+                "application/json": {
+                    "schema": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}, "additionalProperties": false}
+                }
+            }
+        },
+        "402": {"description": "Payment Required"}
+    }
 )
 def signals(timeframe: str = "1d"):
     """Pollux Signals — commodity prices and momentum signals."""
@@ -312,7 +322,17 @@ def decision(symbol: str = Query(default="Gold (XAU/USD)", description="Commodit
             }
         },
     },
-    responses={402: {"description": "Payment Required"}}
+    responses={
+        "200": {
+            "description": "Successful response",
+            "content": {
+                "application/json": {
+                    "schema": {"type": "object", "properties": {"decision_id": {"type": "string"}, "symbol": {"type": "string"}, "suggested_action": {"type": "string"}, "confidence": {"type": "number"}, "evaluation_window": {"type": "string"}, "prices": {"type": "object", "properties": {"entry": {"type": "number"}, "exit": {"type": "number"}}}, "outcome": {"type": "object", "properties": {"pnl_pct": {"type": "number"}, "direction_correct": {"type": "boolean"}, "verdict": {"type": "string"}}}}, "additionalProperties": false}
+                }
+            }
+        },
+        "402": {"description": "Payment Required"}
+    }
 )
 def audit(decision_id: str, window: str = "1d"):
     """Pollux Audit — verify prior commodity decision."""
@@ -354,7 +374,17 @@ def audit(decision_id: str, window: str = "1d"):
             }
         },
     },
-    responses={402: {"description": "Payment Required"}}
+    responses={
+        "200": {
+            "description": "Successful response",
+            "content": {
+                "application/json": {
+                    "schema": {"type": "object", "properties": {"symbol": {"type": "string"}, "ts": {"type": "string"}, "regime": {"type": "string"}, "forecast": {"type": "object", "properties": {"range_80": {"type": "object", "properties": {"lower": {"type": "number"}, "upper": {"type": "number"}}}, "mid": {"type": "number"}, "confidence": {"type": "string"}, "coverage_method": {"type": "string"}}}, "data_freshness": {"type": "string"}}, "additionalProperties": false}
+                }
+            }
+        },
+        "402": {"description": "Payment Required"}
+    }
 )
 def forecast(symbol: str = "Gold (XAU/USD)"):
     """Pollux Forecast — 80% calibrated commodity range."""
@@ -398,7 +428,17 @@ def forecast(symbol: str = "Gold (XAU/USD)"):
             }
         },
     },
-    responses={402: {"description": "Payment Required"}}
+    responses={
+        "200": {
+            "description": "Successful response",
+            "content": {
+                "application/json": {
+                    "schema": {"type": "object", "properties": {"ts": {"type": "string"}, "regime": {"type": "string"}, "risk_level": {"type": "string"}, "risk_factors": {"type": "array", "items": {"type": "string"}}, "cooldown_active": {"type": "boolean"}, "data_freshness": {"type": "string"}}, "additionalProperties": false}
+                }
+            }
+        },
+        "402": {"description": "Payment Required"}
+    }
 )
 def risk():
     """Current commodity market risk state."""
@@ -425,7 +465,7 @@ def risk():
     )
 
 
-@app.get("/health", security=[])
+@app.get("/health")
 def health():
     return {"status": "ok", "service": "atlasmarkets-pollux", "version": "1.0.0"}
 
@@ -452,7 +492,17 @@ _decision_log: list[dict] = []
             }
         },
     },
-    responses={402: {"description": "Payment Required"}}
+    responses={
+        "200": {
+            "description": "Successful response",
+            "content": {
+                "application/json": {
+                    "schema": {"type": "object", "properties": {"symbol": {"type": "string"}, "ts": {"type": "string"}, "can_decide": {"type": "boolean"}, "cooldown_active": {"type": "boolean"}, "market_state": {"type": "string"}, "price": {"type": "number"}, "volatility": {"type": "string"}, "warnings": {"type": "array", "items": {"type": "string"}}, "data_freshness": {"type": "string"}}, "additionalProperties": false}
+                }
+            }
+        },
+        "402": {"description": "Payment Required"}
+    }
 )
 def preflight(symbol: str = "Gold (XAU/USD)"):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
@@ -509,7 +559,17 @@ def preflight(symbol: str = "Gold (XAU/USD)"):
             }
         },
     },
-    responses={402: {"description": "Payment Required"}}
+    responses={
+        "200": {
+            "description": "Successful response",
+            "content": {
+                "application/json": {
+                    "schema": {"type": "object", "properties": {"symbol": {"type": "string"}, "count": {"type": "integer"}, "history": {"type": "array"}, "data_freshness": {"type": "string"}}, "additionalProperties": false}
+                }
+            }
+        },
+        "402": {"description": "Payment Required"}
+    }
 )
 def history(symbol: str = "Gold (XAU/USD)", limit: int = 10):
     """Recent context history for analysis and audit support."""
