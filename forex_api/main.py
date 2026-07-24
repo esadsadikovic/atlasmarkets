@@ -72,7 +72,7 @@ app.openapi = _patched_openapi
 
 # ── x402 payment middleware ──────────────────────────────────────────────────
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
-FACILITATOR_URL = "https://api.cdp.coinbase.com/platform/v2/x402"
+FACILITATOR_URL = os.environ.get("FACILITATOR_URL", "https://x402.xyz/facilitate")
 NETWORK = "eip155:8453"
 
 _facilitator = HTTPFacilitatorClient({"url": FACILITATOR_URL})
