@@ -78,7 +78,7 @@ _x402_server = server.x402ResourceServer(_facilitator)
 _x402_server.register(NETWORK, ExactEvmServerScheme())
 
 _ROUTES = {
-    f"* /api/apollo/{ep}": {
+    f"/api/apollo/{ep}": {
         "accepts": {
             "scheme": "exact",
             "payTo": PAY_TO,
@@ -88,14 +88,14 @@ _ROUTES = {
         "description": f"Apollo {ep} — AtlasMarkets market intelligence",
         "mimeType": "application/json",
     }
-    for ep, (method, price) in {
-        "signals":  ("GET",  "$0.05"),
-        "decision": ("POST", "$0.15"),
-        "audit":    ("GET",  "$0.07"),
-        "forecast": ("GET",  "$0.05"),
-        "risk":     ("GET",  "$0.02"),
-        "preflight":("GET",  "$0.05"),
-        "history":  ("GET",  "$0.05"),
+    for ep, (price, method) in {
+        "signals":   ("$0.05",  "GET"),
+        "decision":  ("$0.15",  "POST"),
+        "audit":     ("$0.07",  "GET"),
+        "forecast":  ("$0.05",  "GET"),
+        "risk":      ("$0.02",  "GET"),
+        "preflight": ("$0.05",  "GET"),
+        "history":   ("$0.05",  "GET"),
     }.items()
 }
 
