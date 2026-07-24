@@ -225,7 +225,7 @@ def signal_score(pct: float) -> float:
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
@@ -305,7 +305,7 @@ def decision(symbol: str = Query(default="Gold (XAU/USD)", description="Commodit
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
@@ -347,7 +347,7 @@ def audit(decision_id: str, window: str = "1d"):
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
@@ -391,7 +391,7 @@ def forecast(symbol: str = "Gold (XAU/USD)"):
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
@@ -445,7 +445,7 @@ _decision_log: list[dict] = []
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
@@ -502,7 +502,7 @@ def preflight(symbol: str = "Gold (XAU/USD)"):
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }

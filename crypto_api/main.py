@@ -237,7 +237,7 @@ def signal_score(pct_24h: float) -> float:
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
@@ -328,7 +328,7 @@ def decision(symbol: str = Query(default="BTC", description="Crypto symbol e.g. 
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
@@ -376,7 +376,7 @@ def audit(decision_id: str, window: str = "1h"):
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
@@ -423,7 +423,7 @@ def forecast(symbol: str = "BTC"):
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
@@ -483,7 +483,7 @@ _decision_log: list[dict] = []
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
@@ -537,7 +537,7 @@ def preflight(symbol: str = "BTC"):
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {},
+                         "properties": {}, "additionalProperties": false,
                         "additionalProperties": False
                     }
                 }
