@@ -24,54 +24,7 @@ app = FastAPI(
     title="AtlasMarkets — Dagon",
     version="1.0.0",
     contact={"email": "max.sadikovic@gmail.com"},
-    openapi_extra={
-        "x-agentcash-provenance": {
-            "ownershipProofs": [
-                "d5299c94df61f692f8b778c964348de932f192c43bcaf5ec8757c206ea926d400cd421daacc73ead49370897e0d593e23a1aa46299ab1dad747c575da31b2f3e1c",
-                "89f89072a0260fe47bd2e65450e6032cb74c247c1f8667b2a43c5c9b07d0dbcf647a9deef60570e5da312c649b3f93359340bdf249cbfda01e41116851c756e21b",
-                "f0fa23832316e244b1524ac9de2bc94ae21aadf46a3c9c2565af6dfe9e55acb3431f43fc673dd8162d0bd5f38cb7b594144f0d04498d421c261e0bb65cf53b8d1b",
-                "d9b9b997a3f0ebb605015f091009cff80eeff8d8078eb13a0431692f89f0dfb87f8c96b5dcb0769f7923d62bb98ee795c0caa8f7f476955f377b9d6e828189341c",
-                "d6ec3f51dbebbb6c945e65d6de81f665c32fef26b8761b9bd961cc77519103f05e9d9bdbf356d2d47af2b5edbcfe68c3b38c64621ea77d059fc734d5a041ea2f1b",
-            ]
-        },
-    },
 )
-
-# —— Root-level OpenAPI extensions ————————————————————————————————————————————————
-_orig_openapi = app.openapi
-
-def _patched_openapi():
-    schema = _orig_openapi()
-    schema["info"]["x-guidance"] = (
-        "AtlasMarkets Dagon provides on-chain market intelligence for AI agents. "
-        "Routes: GET /api/dagon/signals ($0.05), GET /api/dagon/forecast?symbol=ETH ($0.05), "
-        "GET /api/dagon/risk ($0.02), GET /api/dagon/preflight?symbol=ETH ($0.05), "
-        "GET /api/dagon/history?symbol=ETH ($0.05), GET /api/dagon/audit?decision_id=X ($0.07), "
-        "POST /api/dagon/decision?symbol=ETH ($0.15). All routes return real-time on-chain data."
-    )
-    schema["x-x402"] = {
-        "network": "eip155:8453",
-        "payTo": "0x8eB96caA976De43027FEf619c4D24F6679486277",
-        "facilitator": "https://x402.xyz/facilitate",
-        "extensions": {
-            "bazaar": {
-                "status": "live",
-                "purpose": "AtlasMarkets Dagon on-chain market intelligence for AI agents.",
-            }
-        },
-    }
-    schema["components"] = schema.get("components", {})
-    schema["components"]["securitySchemes"] = {
-        "siwx": {
-            "type": "http",
-            "scheme": "bearer",
-            "bearerFormat": "SIWX",
-            "description": "Sign-In with X (SIWX) wallet authentication"
-        }
-    }
-    return schema
-
-app.openapi = _patched_openapi
 
 # —— x402 payment middleware —————————————————————————————————————————————————————
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -126,7 +79,6 @@ DEFI_LLAMA_URL = "https://api.llama.fi/protocols"
 def get_eth_gas() -> dict:
     """Get ETH gas prices from Etherscan free API (no key for limited calls)."""
     try:
-        # Use public ETH gas tracker endpoint
         url = "https://api.etherscan.io/api?module=gastracker&action=gasoracle"
         resp = requests.get(url, timeout=5)
         if resp.status_code == 200:
@@ -137,13 +89,6 @@ def get_eth_gas() -> dict:
                 "propose_gwei": float(result.get("ProposeGasPrice", 25)),
                 "fast_gwei": float(result.get("FastGasPrice", 30)),
             }
-    except Exception:
-        pass
-    # Fallback to blockchain.com public API
-    try:
-        resp = requests.get("https://blockchain.info/latestblock", timeout=5)
-        if resp.status_code == 200:
-            return {"safe_gwei": 20.0, "propose_gwei": 25.0, "fast_gwei": 30.0}
     except Exception:
         pass
     return {"safe_gwei": 20.0, "propose_gwei": 25.0, "fast_gwei": 30.0}
@@ -172,7 +117,6 @@ def get_defi_tvl() -> list:
         resp = requests.get(DEFI_LLAMA_URL, timeout=8)
         if resp.status_code == 200:
             protocols = resp.json()
-            # Return top protocols by TVL
             sorted_p = sorted(protocols, key=lambda x: x.get("tvlUsd", 0) or 0, reverse=True)
             return [
                 {"name": p["name"], "tvl": round(p.get("tvlUsd", 0) / 1e9, 2), "change_1d": round(p.get("change_1d", 0) or 0, 2)}
@@ -185,7 +129,6 @@ def get_defi_tvl() -> list:
 
 def get_whale_alerts() -> list:
     """Simulated whale transaction alerts — real data would need a paid API."""
-    # In production: use Whale Alert API or Glassnode
     return [
         {"type": "BTC", "amount_usd": 12500000, "side": "buy", "exchange": "Binance"},
         {"type": "ETH", "amount_usd": 3200000, "side": "sell", "exchange": "Coinbase"},
@@ -261,65 +204,16 @@ def regime_from_gas(gwei: float) -> str:
 
 
 def signal_score(gwei: float) -> float:
-    # High gas = bearish for DeFi activity
     return round(max(-1, min(1, (30 - gwei) / 30)), 4)
 
 
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
 @app.get("/api/dagon/signals", response_model=SignalsResponse,
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d"}}
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "ts": {"type": "string"},
-                            "timeframe": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "signals": {"type": "object"},
-                            "top_k": {"type": "array", "items": {"type": "string"}},
-                            "signal_age_hours": {"type": "number"},
-                            "data_freshness": {"type": "string"}
-                        }
-                    }
-                }
-            }
-        },
-        "parameters": [{"name": "timeframe", "in": "query", "required": False, "schema": {"type": "string", "default": "15m"}}],
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "ts": {"type": "string"},
-                            "timeframe": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "signals": {"type": "object"},
-                            "top_k": {"type": "array", "items": {"type": "string"}},
-                            "signal_age_hours": {"type": "number"},
-                            "data_freshness": {"type": "string"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}},
+    parameters=[
+        Query(default="15m", description="Time window e.g. 15m, 1h, 1d")
+    ]
 )
 def signals(timeframe: str = "15m"):
     """Dagon Signals — ETH gas, BTC fees, DeFi TVL, whale alerts."""
@@ -347,66 +241,7 @@ def signals(timeframe: str = "15m"):
 
 
 @app.post("/api/dagon/decision", response_model=DecisionResponse,
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.150000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "ETH or BTC"}},
-                        "required": ["symbol"]
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string"},
-                            "symbol": {"type": "string"},
-                            "suggested_action": {"type": "string"},
-                            "confidence": {"type": "number"},
-                            "certainty": {"type": "string"},
-                            "directional_edge": {"type": "string"},
-                            "raw_signal": {"type": "number"},
-                            "regime": {"type": "string"},
-                            "risk_level": {"type": "string"},
-                            "data_freshness": {"type": "string"},
-                            "next_step": {"type": "object"}
-                        }
-                    }
-                }
-            }
-        }
-    },
-    responses={
-        "200": {
-            "description": "Decision outcome",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string"},
-                            "symbol": {"type": "string"},
-                            "suggested_action": {"type": "string"},
-                            "confidence": {"type": "number"},
-                            "certainty": {"type": "string"},
-                            "directional_edge": {"type": "string"},
-                            "raw_signal": {"type": "number"},
-                            "regime": {"type": "string"},
-                            "risk_level": {"type": "string"},
-                            "data_freshness": {"type": "string"},
-                            "next_step": {"type": "object"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}}
 )
 def decision(request: DecisionRequest):
     """Dagon Decision — whether to interact on-chain now."""
@@ -449,65 +284,11 @@ def decision(request: DecisionRequest):
 
 
 @app.get("/api/dagon/audit",
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string", "description": "Decision ID to audit"},
-                            "window": {"type": "string", "description": "Evaluation window e.g. 1h"}
-                        },
-                        "required": ["decision_id"]
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string"},
-                            "symbol": {"type": "string"},
-                            "suggested_action": {"type": "string"},
-                            "confidence": {"type": "number"},
-                            "evaluation_window": {"type": "string"},
-                            "prices": {"type": "object"},
-                            "outcome": {"type": "object"}
-                        }
-                    }
-                }
-            }
-        },
-        "parameters": [
-            {"name": "decision_id", "in": "query", "required": True, "schema": {"type": "string"}},
-            {"name": "window", "in": "query", "required": False, "schema": {"type": "string", "default": "1h"}}
-        ],
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string"},
-                            "symbol": {"type": "string"},
-                            "suggested_action": {"type": "string"},
-                            "confidence": {"type": "number"},
-                            "evaluation_window": {"type": "string"},
-                            "prices": {"type": "object"},
-                            "outcome": {"type": "object"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}},
+    parameters=[
+        Query(..., description="Decision ID to audit"),
+        Query(default="1h", description="Evaluation window e.g. 1h")
+    ]
 )
 def audit(decision_id: str, window: str = "1h"):
     """Dagon Audit — verify prior decision outcome against real on-chain conditions."""
@@ -535,54 +316,10 @@ def audit(decision_id: str, window: str = "1h"):
 
 
 @app.get("/api/dagon/forecast",
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "ETH or BTC"}}
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "ts": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "forecast": {"type": "object"},
-                            "data_freshness": {"type": "string"}
-                        }
-                    }
-                }
-            }
-        },
-        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "ETH"}}],
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "ts": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "forecast": {"type": "object"},
-                            "data_freshness": {"type": "string"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}},
+    parameters=[
+        Query(default="ETH", description="ETH or BTC")
+    ]
 )
 def forecast(symbol: str = "ETH"):
     """Dagon Forecast — conformally-calibrated 80% gas fee range."""
@@ -591,7 +328,6 @@ def forecast(symbol: str = "ETH"):
     current_gwei = gas["propose_gwei"]
     regime = regime_from_gas(current_gwei)
 
-    # 80% empirical coverage for gas
     vol = current_gwei * 0.15
     return {
         "symbol": sym,
@@ -611,55 +347,7 @@ def forecast(symbol: str = "ETH"):
 
 
 @app.get("/api/dagon/risk",
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {}
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "ts": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "risk_level": {"type": "string"},
-                            "risk_factors": {"type": "array", "items": {"type": "string"}},
-                            "cooldown_active": {"type": "boolean"},
-                            "data_freshness": {"type": "string"}
-                        }
-                    }
-                }
-            }
-        },
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "ts": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "risk_level": {"type": "string"},
-                            "risk_factors": {"type": "array", "items": {"type": "string"}},
-                            "cooldown_active": {"type": "boolean"},
-                            "data_freshness": {"type": "string"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}}
 )
 def risk():
     """Current on-chain risk state and cooldown context."""
@@ -689,7 +377,7 @@ def risk():
 
 # —— Health —————————————————————————————————————————————————————————————————————————————
 
-@app.get("/health")
+@app.get("/health", responses={"200": {"description": "Service is healthy"}})
 def health():
     return {"status": "ok", "service": "atlasmarkets-onchain", "version": "1.0.0"}
 
@@ -700,62 +388,10 @@ _decision_log: list[dict] = []
 
 
 @app.get("/api/dagon/preflight",
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "ETH or BTC"}}
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "ts": {"type": "string"},
-                            "can_decide": {"type": "boolean"},
-                            "cooldown_active": {"type": "boolean"},
-                            "market_state": {"type": "string"},
-                            "value": {"type": "number"},
-                            "volatility": {"type": "string"},
-                            "warnings": {"type": "array", "items": {"type": "string"}},
-                            "data_freshness": {"type": "string"}
-                        }
-                    }
-                }
-            }
-        },
-        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "ETH"}}],
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "ts": {"type": "string"},
-                            "can_decide": {"type": "boolean"},
-                            "cooldown_active": {"type": "boolean"},
-                            "market_state": {"type": "string"},
-                            "value": {"type": "number"},
-                            "volatility": {"type": "string"},
-                            "warnings": {"type": "array", "items": {"type": "string"}},
-                            "data_freshness": {"type": "string"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}},
+    parameters=[
+        Query(default="ETH", description="ETH or BTC")
+    ]
 )
 def preflight(symbol: str = "ETH"):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
@@ -790,58 +426,11 @@ def preflight(symbol: str = "ETH"):
 
 
 @app.get("/api/dagon/history",
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string", "description": "ETH or BTC"},
-                            "limit": {"type": "integer", "description": "Max entries"}
-                        }
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "count": {"type": "integer"},
-                            "history": {"type": "array"},
-                            "data_freshness": {"type": "string"}
-                        }
-                    }
-                }
-            }
-        },
-        "parameters": [
-            {"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "ETH"}},
-            {"name": "limit", "in": "query", "required": False, "schema": {"type": "integer", "default": 10}}
-        ],
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "count": {"type": "integer"},
-                            "history": {"type": "array"},
-                            "data_freshness": {"type": "string"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}},
+    parameters=[
+        Query(default="ETH", description="ETH or BTC"),
+        Query(default=10, description="Max entries")
+    ]
 )
 def history(symbol: str = "ETH", limit: int = 10):
     """Recent context history for analysis and audit support."""

@@ -4,14 +4,14 @@
     "title": "AtlasMarkets — Anubis",
     "version": "1.0.0",
     "description": "Crypto market intelligence for AI agents. x402-protected on Base mainnet.",
-    "x-guidance": "AtlasMarkets Anubis provides crypto market intelligence for AI agents. Routes: GET /api/anubis/signals ($0.05), GET /api/anubis/forecast?symbol=BTC ($0.05), GET /api/anubis/risk ($0.02), GET /api/anubis/preflight?symbol=BTC ($0.05), GET /api/anubis/history?symbol=BTC ($0.05), GET /api/anubis/audit?decision_id=X ($0.07), POST /api/anubis/decision?symbol=BTC ($0.15). All routes return real-time crypto data.",
+    "x-guidance": "AtlasMarkets Anubis provides crypto market intelligence for AI agents. Routes: GET /api/anubis/signals ($0.05), GET /api/anubis/forecast?symbol=BTC ($0.05), GET /api/anubis/risk ($0.02), GET /api/anubis/preflight?symbol=BTC ($0.05), GET /api/anubis/history?symbol=BTC ($0.05), GET /api/anubis/audit?decision_id=X ($0.07), POST /api/anubis/decision ($0.15). All routes return real-time crypto data.",
     "contact": {
       "email": "max.sadikovic@gmail.com"
     }
   },
   "servers": [
     {
-      "url": "https://atlasmarkets-production-2888.up.railway.app",
+      "url": "https://atlasmarkets-anubis.onrender.com",
       "description": "Production"
     }
   ],
@@ -40,17 +40,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ts": {"type": "string"},
-                    "timeframe": {"type": "string"},
-                    "regime": {"type": "string"},
-                    "signals": {"type": "object"},
-                    "top_k": {"type": "array", "items": {"type": "string"}},
-                    "signal_age_hours": {"type": "number"},
-                    "data_freshness": {"type": "string"}
-                  },
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/SignalsResponse"
                 }
               }
             }
@@ -73,12 +63,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": ["symbol"],
-                "properties": {
-                  "symbol": {"type": "string", "description": "Crypto symbol e.g. BTC, ETH"}
-                },
-                "additionalProperties": false
+                "$ref": "#/components/schemas/DecisionRequest"
               }
             }
           }
@@ -89,21 +74,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "decision_id": {"type": "string"},
-                    "symbol": {"type": "string"},
-                    "suggested_action": {"type": "string"},
-                    "confidence": {"type": "number"},
-                    "certainty": {"type": "string"},
-                    "directional_edge": {"type": "string"},
-                    "raw_signal": {"type": "number"},
-                    "regime": {"type": "string"},
-                    "risk_level": {"type": "string"},
-                    "data_freshness": {"type": "string"},
-                    "next_step": {"type": "object"}
-                  },
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/DecisionResponse"
                 }
               }
             }
@@ -143,17 +114,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "decision_id": {"type": "string"},
-                    "symbol": {"type": "string"},
-                    "suggested_action": {"type": "string"},
-                    "confidence": {"type": "number"},
-                    "evaluation_window": {"type": "string"},
-                    "prices": {"type": "object"},
-                    "outcome": {"type": "object"}
-                  },
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/AuditResponse"
                 }
               }
             }
@@ -186,15 +147,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "symbol": {"type": "string"},
-                    "ts": {"type": "string"},
-                    "regime": {"type": "string"},
-                    "forecast": {"type": "object"},
-                    "data_freshness": {"type": "string"}
-                  },
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/ForecastResponse"
                 }
               }
             }
@@ -218,16 +171,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ts": {"type": "string"},
-                    "regime": {"type": "string"},
-                    "risk_level": {"type": "string"},
-                    "risk_factors": {"type": "array", "items": {"type": "string"}},
-                    "cooldown_active": {"type": "boolean"},
-                    "data_freshness": {"type": "string"}
-                  },
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/RiskResponse"
                 }
               }
             }
@@ -333,6 +277,7 @@
         "operationId": "getHealth",
         "tags": ["Utility"],
         "summary": "Health check",
+        "security": [],
         "responses": {
           "200": {
             "description": "Service is healthy",
@@ -353,6 +298,82 @@
         "scheme": "bearer",
         "bearerFormat": "SIWX",
         "description": "Sign-In with X (SIWX) wallet authentication"
+      }
+    },
+    "schemas": {
+      "SignalsResponse": {
+        "type": "object",
+        "properties": {
+          "ts": {"type": "string"},
+          "timeframe": {"type": "string"},
+          "regime": {"type": "string"},
+          "signals": {"type": "object"},
+          "top_k": {"type": "array", "items": {"type": "string"}},
+          "signal_age_hours": {"type": "number"},
+          "data_freshness": {"type": "string"}
+        },
+        "additionalProperties": false
+      },
+      "DecisionRequest": {
+        "type": "object",
+        "required": ["symbol"],
+        "properties": {
+          "symbol": {"type": "string", "description": "Crypto symbol e.g. BTC, ETH"}
+        },
+        "additionalProperties": false
+      },
+      "DecisionResponse": {
+        "type": "object",
+        "properties": {
+          "decision_id": {"type": "string"},
+          "symbol": {"type": "string"},
+          "suggested_action": {"type": "string"},
+          "confidence": {"type": "number"},
+          "certainty": {"type": "string"},
+          "directional_edge": {"type": "string"},
+          "raw_signal": {"type": "number"},
+          "regime": {"type": "string"},
+          "risk_level": {"type": "string"},
+          "data_freshness": {"type": "string"},
+          "next_step": {"type": "object"}
+        },
+        "additionalProperties": false
+      },
+      "AuditResponse": {
+        "type": "object",
+        "properties": {
+          "decision_id": {"type": "string"},
+          "symbol": {"type": "string"},
+          "suggested_action": {"type": "string"},
+          "confidence": {"type": "number"},
+          "evaluation_window": {"type": "string"},
+          "prices": {"type": "object"},
+          "outcome": {"type": "object"}
+        },
+        "additionalProperties": false
+      },
+      "ForecastResponse": {
+        "type": "object",
+        "properties": {
+          "symbol": {"type": "string"},
+          "ts": {"type": "string"},
+          "regime": {"type": "string"},
+          "forecast": {"type": "object"},
+          "data_freshness": {"type": "string"}
+        },
+        "additionalProperties": false
+      },
+      "RiskResponse": {
+        "type": "object",
+        "properties": {
+          "ts": {"type": "string"},
+          "regime": {"type": "string"},
+          "risk_level": {"type": "string"},
+          "risk_factors": {"type": "array", "items": {"type": "string"}},
+          "cooldown_active": {"type": "boolean"},
+          "data_freshness": {"type": "string"}
+        },
+        "additionalProperties": false
       }
     }
   },

@@ -23,54 +23,7 @@ app = FastAPI(
     title="AtlasMarkets — Apollo",
     version="1.0.0",
     contact={"email": "max.sadikovic@gmail.com"},
-    openapi_extra={
-        "x-agentcash-provenance": {
-            "ownershipProofs": [
-                "d5299c94df61f692f8b778c964348de932f192c43bcaf5ec8757c206ea926d400cd421daacc73ead49370897e0d593e23a1aa46299ab1dad747c575da31b2f3e1c",
-                "89f89072a0260fe47bd2e65450e6032cb74c247c1f8667b2a43c5c9b07d0dbcf647a9deef60570e5da312c649b3f93359340bdf249cbfda01e41116851c756e21b",
-                "f0fa23832316e244b1524ac9de2bc94ae21aadf46a3c9c2565af6dfe9e55acb3431f43fc673dd8162d0bd5f38cb7b594144f0d04498d421c261e0bb65cf53b8d1b",
-                "d9b9b997a3f0ebb605015f091009cff80eeff8d8078eb13a0431692f89f0dfb87f8c96b5dcb0769f7923d62bb98ee795c0caa8f7f476955f377b9d6e828189341c",
-                "d6ec3f51dbebbb6c945e65d6de81f665c32fef26b8761b9bd961cc77519103f05e9d9bdbf356d2d47af2b5edbcfe68c3b38c64621ea77d059fc734d5a041ea2f1b",
-            ]
-        },
-    },
 )
-
-# —— Root-level OpenAPI extensions ————————————————————————————————————————————————
-_orig_openapi = app.openapi
-
-def _patched_openapi():
-    schema = _orig_openapi()
-    schema["info"]["x-guidance"] = (
-        "AtlasMarkets Apollo provides forex market intelligence for AI agents. "
-        "Routes: GET /api/apollo/signals ($0.05), GET /api/apollo/forecast?asset=EUR/USD ($0.05), "
-        "GET /api/apollo/risk ($0.02), GET /api/apollo/preflight?asset=EUR/USD ($0.05), "
-        "GET /api/apollo/history?asset=EUR/USD ($0.05), GET /api/apollo/audit?decision_id=X ($0.07), "
-        "POST /api/apollo/decision?symbol=EUR/USD ($0.15). All routes return real-time forex data."
-    )
-    schema["x-x402"] = {
-        "network": "eip155:8453",
-        "payTo": "0x8eB96caA976De43027FEf619c4D24F6679486277",
-        "facilitator": "https://x402.xyz/facilitate",
-        "extensions": {
-            "bazaar": {
-                "status": "live",
-                "purpose": "AtlasMarkets Apollo forex market intelligence for AI agents.",
-            }
-        },
-    }
-    schema["components"] = schema.get("components", {})
-    schema["components"]["securitySchemes"] = {
-        "siwx": {
-            "type": "http",
-            "scheme": "bearer",
-            "bearerFormat": "SIWX",
-            "description": "Sign-In with X (SIWX) wallet authentication"
-        }
-    }
-    return schema
-
-app.openapi = _patched_openapi
 
 # —— x402 payment middleware —————————————————————————————————————————————————————
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -230,58 +183,10 @@ def signal_score(pct: float) -> float:
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
 @app.get("/api/apollo/signals", response_model=SignalsResponse,
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d, 4h"}}
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "ts": {"type": "string"},
-                            "timeframe": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "signals": {"type": "object"},
-                            "top_k": {"type": "array", "items": {"type": "string"}},
-                            "signal_age_hours": {"type": "number"},
-                            "data_freshness": {"type": "string"}
-                        }
-                    }
-                }
-            }
-        },
-        "parameters": [{"name": "timeframe", "in": "query", "required": False, "schema": {"type": "string", "default": "4h"}}],
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "ts": {"type": "string"},
-                            "timeframe": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "signals": {"type": "object"},
-                            "top_k": {"type": "array", "items": {"type": "string"}},
-                            "signal_age_hours": {"type": "number"},
-                            "data_freshness": {"type": "string"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}},
+    parameters=[
+        Query(default="4h", description="Time window e.g. 15m, 1h, 1d, 4h")
+    ]
 )
 def signals(timeframe: str = "4h"):
     """Apollo Signals — forex pair rates and momentum signals."""
@@ -301,66 +206,7 @@ def signals(timeframe: str = "4h"):
 
 
 @app.post("/api/apollo/decision", response_model=DecisionResponse,
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.150000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "Forex pair e.g. EURUSD, GBPUSD, USDJPY"}},
-                        "required": ["symbol"]
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string"},
-                            "symbol": {"type": "string"},
-                            "suggested_action": {"type": "string"},
-                            "confidence": {"type": "number"},
-                            "certainty": {"type": "string"},
-                            "directional_edge": {"type": "string"},
-                            "raw_signal": {"type": "number"},
-                            "regime": {"type": "string"},
-                            "risk_level": {"type": "string"},
-                            "data_freshness": {"type": "string"},
-                            "next_step": {"type": "object"}
-                        }
-                    }
-                }
-            }
-        }
-    },
-    responses={
-        "200": {
-            "description": "Decision outcome",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string"},
-                            "symbol": {"type": "string"},
-                            "suggested_action": {"type": "string"},
-                            "confidence": {"type": "number"},
-                            "certainty": {"type": "string"},
-                            "directional_edge": {"type": "string"},
-                            "raw_signal": {"type": "number"},
-                            "regime": {"type": "string"},
-                            "risk_level": {"type": "string"},
-                            "data_freshness": {"type": "string"},
-                            "next_step": {"type": "object"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}}
 )
 def decision(request: DecisionRequest):
     """Apollo Decision — BUY / SELL / HOLD for forex pair."""
@@ -396,65 +242,11 @@ def decision(request: DecisionRequest):
 
 
 @app.get("/api/apollo/audit",
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string", "description": "Decision ID to audit"},
-                            "window": {"type": "string", "description": "Evaluation window e.g. 1h"}
-                        },
-                        "required": ["decision_id"]
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string"},
-                            "symbol": {"type": "string"},
-                            "suggested_action": {"type": "string"},
-                            "confidence": {"type": "number"},
-                            "evaluation_window": {"type": "string"},
-                            "prices": {"type": "object"},
-                            "outcome": {"type": "object"}
-                        }
-                    }
-                }
-            }
-        },
-        "parameters": [
-            {"name": "decision_id", "in": "query", "required": True, "schema": {"type": "string"}},
-            {"name": "window", "in": "query", "required": False, "schema": {"type": "string", "default": "1h"}}
-        ],
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "decision_id": {"type": "string"},
-                            "symbol": {"type": "string"},
-                            "suggested_action": {"type": "string"},
-                            "confidence": {"type": "number"},
-                            "evaluation_window": {"type": "string"},
-                            "prices": {"type": "object"},
-                            "outcome": {"type": "object"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}},
+    parameters=[
+        Query(..., description="Decision ID to audit"),
+        Query(default="1h", description="Evaluation window e.g. 1h")
+    ]
 )
 def audit(decision_id: str, window: str = "1h"):
     """Apollo Audit — verify prior decision outcome against real prices."""
@@ -482,54 +274,10 @@ def audit(decision_id: str, window: str = "1h"):
 
 
 @app.get("/api/apollo/forecast",
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {"asset": {"type": "string", "description": "Forex pair e.g. EUR/USD, GBP/USD"}}
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "ts": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "forecast": {"type": "object"},
-                            "data_freshness": {"type": "string"}
-                        }
-                    }
-                }
-            }
-        },
-        "parameters": [{"name": "asset", "in": "query", "required": False, "schema": {"type": "string", "default": "EUR/USD"}}],
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "ts": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "forecast": {"type": "object"},
-                            "data_freshness": {"type": "string"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}},
+    parameters=[
+        Query(default="EUR/USD", description="Forex pair e.g. EUR/USD, GBP/USD")
+    ]
 )
 def forecast(asset: str = "EUR/USD"):
     """Apollo Forecast — conformally-calibrated 80% price range for forex pair."""
@@ -557,55 +305,7 @@ def forecast(asset: str = "EUR/USD"):
 
 
 @app.get("/api/apollo/risk",
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {}
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "ts": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "risk_level": {"type": "string"},
-                            "risk_factors": {"type": "array", "items": {"type": "string"}},
-                            "cooldown_active": {"type": "boolean"},
-                            "data_freshness": {"type": "string"}
-                        }
-                    }
-                }
-            }
-        },
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "ts": {"type": "string"},
-                            "regime": {"type": "string"},
-                            "risk_level": {"type": "string"},
-                            "risk_factors": {"type": "array", "items": {"type": "string"}},
-                            "cooldown_active": {"type": "boolean"},
-                            "data_freshness": {"type": "string"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}}
 )
 def risk():
     """Current forex market risk state and cooldown context."""
@@ -636,7 +336,7 @@ def risk():
 
 # —— Health —————————————————————————————————————————————————————————————————————————————
 
-@app.get("/health")
+@app.get("/health", responses={"200": {"description": "Service is healthy"}})
 def health():
     return {"status": "ok", "service": "atlasmarkets-forex", "version": "1.0.0"}
 
@@ -647,62 +347,10 @@ _decision_log: list[dict] = []
 
 
 @app.get("/api/apollo/preflight",
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {"asset": {"type": "string", "description": "Forex pair e.g. EUR/USD"}}
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "ts": {"type": "string"},
-                            "can_decide": {"type": "boolean"},
-                            "cooldown_active": {"type": "boolean"},
-                            "market_state": {"type": "string"},
-                            "rate": {"type": "number"},
-                            "volatility": {"type": "string"},
-                            "warnings": {"type": "array", "items": {"type": "string"}},
-                            "data_freshness": {"type": "string"}
-                        }
-                    }
-                }
-            }
-        },
-        "parameters": [{"name": "asset", "in": "query", "required": False, "schema": {"type": "string", "default": "EUR/USD"}}],
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "ts": {"type": "string"},
-                            "can_decide": {"type": "boolean"},
-                            "cooldown_active": {"type": "boolean"},
-                            "market_state": {"type": "string"},
-                            "rate": {"type": "number"},
-                            "volatility": {"type": "string"},
-                            "warnings": {"type": "array", "items": {"type": "string"}},
-                            "data_freshness": {"type": "string"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}},
+    parameters=[
+        Query(default="EUR/USD", description="Forex pair e.g. EUR/USD")
+    ]
 )
 def preflight(asset: str = "EUR/USD"):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
@@ -739,58 +387,11 @@ def preflight(asset: str = "EUR/USD"):
 
 
 @app.get("/api/apollo/history",
-    openapi_extra={
-        "x-payment-info": {
-            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
-            "protocols": [{"x402": {}}]
-        },
-        "x-bazaar": {
-            "schema": {
-                "properties": {
-                    "input": {
-                        "type": "object",
-                        "properties": {
-                            "asset": {"type": "string", "description": "Forex pair e.g. EUR/USD"},
-                            "limit": {"type": "integer", "description": "Max entries"}
-                        }
-                    },
-                    "output": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "count": {"type": "integer"},
-                            "history": {"type": "array"},
-                            "data_freshness": {"type": "string"}
-                        }
-                    }
-                }
-            }
-        },
-        "parameters": [
-            {"name": "asset", "in": "query", "required": False, "schema": {"type": "string", "default": "EUR/USD"}},
-            {"name": "limit", "in": "query", "required": False, "schema": {"type": "integer", "default": 10}}
-        ],
-    },
-    responses={
-        "200": {
-            "description": "Successful response",
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "count": {"type": "integer"},
-                            "history": {"type": "array"},
-                            "data_freshness": {"type": "string"}
-                        },
-                        "additionalProperties": False
-                    }
-                }
-            }
-        },
-        "402": {"description": "Payment Required"}
-    }
+    responses={"402": {"description": "Payment Required"}},
+    parameters=[
+        Query(default="EUR/USD", description="Forex pair e.g. EUR/USD"),
+        Query(default=10, description="Max entries")
+    ]
 )
 def history(asset: str = "EUR/USD", limit: int = 10):
     """Recent context history for analysis and audit support."""
