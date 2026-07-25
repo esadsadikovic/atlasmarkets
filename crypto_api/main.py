@@ -59,9 +59,7 @@ _ROUTES = {
     }.items()
 }
 
-@app.middleware("http")
-async def x402_mw(request: Request, call_next):
-    return await payment_middleware(_ROUTES, _x402_server)(request, call_next)
+app.add_middleware(payment_middleware, _routes=_ROUTES, _x402_server=_x402_server)
 
 app.add_middleware(
     CORSMiddleware,
