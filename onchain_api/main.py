@@ -236,7 +236,13 @@ def signal_score(gwei: float) -> float:
 # —— OpenAPI spec (served from static file) ——————————————————————————
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
-@app.get("/api/dagon/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}})
+@app.get("/api/dagon/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Returns on-chain signals: ETH gas, BTC fees, DeFi TVL, whale alerts. Pass ?timeframe=15m.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def signals(timeframe: str = Query(default="15m", description="Time window e.g. 15m, 1h, 1d")):
     """Dagon Signals — ETH gas, BTC fees, DeFi TVL, whale alerts."""
     gas = get_eth_gas()
@@ -303,7 +309,13 @@ def decision(request: DecisionRequest):
     )
 
 
-@app.get("/api/dagon/audit", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/dagon/audit", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Verify a prior decision outcome against real on-chain conditions. Pass ?decision_id=X.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
     """Dagon Audit — verify prior decision outcome against real on-chain conditions."""
     gas = get_eth_gas()
@@ -329,7 +341,13 @@ def audit(decision_id: str = Query(..., description="Decision ID to audit"), win
     }
 
 
-@app.get("/api/dagon/forecast", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/dagon/forecast", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Get conformally-calibrated 80% gas fee range. Pass ?symbol=ETH.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def forecast(symbol: str = Query(default="ETH", description="ETH or BTC")):
     """Dagon Forecast — conformally-calibrated 80% gas fee range."""
     sym = symbol.upper()
@@ -355,7 +373,13 @@ def forecast(symbol: str = Query(default="ETH", description="ETH or BTC")):
     }
 
 
-@app.get("/api/dagon/risk", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/dagon/risk", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Current on-chain risk state: ETH gas, BTC fees, DeFi TVL. No parameters required.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def risk():
     """Current on-chain risk state and cooldown context."""
     gas = get_eth_gas()
@@ -395,7 +419,13 @@ def health():
 _decision_log: list[dict] = []
 
 
-@app.get("/api/dagon/preflight", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/dagon/preflight", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Check pre-decision conditions: cooldowns, market state, freshness. Pass ?symbol=ETH.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def preflight(symbol: str = Query(default="ETH", description="ETH or BTC")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
@@ -428,7 +458,13 @@ def preflight(symbol: str = Query(default="ETH", description="ETH or BTC")):
     }
 
 
-@app.get("/api/dagon/history", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/dagon/history", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Get recent context history. Pass ?symbol=ETH&limit=10.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def history(symbol: str = Query(default="ETH", description="ETH or BTC"), limit: int = Query(default=10, description="Max entries")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()

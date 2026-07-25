@@ -209,7 +209,13 @@ def signal_score(pct: float) -> float:
 # —— OpenAPI spec (served from static file) ——————————————————————————
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
-@app.get("/api/apollo/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}})
+@app.get("/api/apollo/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Returns ranked forex pair signals. Pass ?timeframe=4h for 4-hour signals.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def signals(timeframe: str = Query(default="4h", description="Time window e.g. 15m, 1h, 1d, 4h")):
     """Apollo Signals — forex pair rates and momentum signals."""
     all_signals = get_forex_signals()
@@ -261,7 +267,13 @@ def decision(request: DecisionRequest):
     )
 
 
-@app.get("/api/apollo/audit", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/apollo/audit", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Verify a prior decision outcome. Pass ?decision_id=X.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
     """Apollo Audit — verify prior decision outcome against real prices."""
     signals = get_forex_signals()
@@ -287,7 +299,13 @@ def audit(decision_id: str = Query(..., description="Decision ID to audit"), win
     }
 
 
-@app.get("/api/apollo/forecast", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/apollo/forecast", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Get conformally-calibrated 80% price range. Pass ?asset=EUR/USD.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def forecast(asset: str = Query(default="EUR/USD", description="Forex pair e.g. EUR/USD, GBP/USD")):
     """Apollo Forecast — conformally-calibrated 80% price range for forex pair."""
     sym = asset.upper().replace("/", "")
@@ -313,7 +331,13 @@ def forecast(asset: str = Query(default="EUR/USD", description="Forex pair e.g. 
     }
 
 
-@app.get("/api/apollo/risk", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/apollo/risk", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Current forex market risk state and regime. No parameters required.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def risk():
     """Current forex market risk state and cooldown context."""
     signals = get_forex_signals()
@@ -354,7 +378,13 @@ def health():
 _decision_log: list[dict] = []
 
 
-@app.get("/api/apollo/preflight", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/apollo/preflight", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Check pre-decision conditions: cooldowns, market state, freshness. Pass ?asset=EUR/USD.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def preflight(asset: str = Query(default="EUR/USD", description="Forex pair e.g. EUR/USD")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = asset.upper().replace("/", "")
@@ -389,7 +419,13 @@ def preflight(asset: str = Query(default="EUR/USD", description="Forex pair e.g.
     }
 
 
-@app.get("/api/apollo/history", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/apollo/history", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Get recent context history. Pass ?asset=EUR/USD&limit=10.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def history(asset: str = Query(default="EUR/USD", description="Forex pair e.g. EUR/USD"), limit: int = Query(default=10, description="Max entries")):
     """Recent context history for analysis and audit support."""
     sym = asset.upper().replace("/", "")

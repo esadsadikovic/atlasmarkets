@@ -210,7 +210,13 @@ def signal_score(pct: float) -> float:
 # —— OpenAPI spec (served from static file) ——————————————————————————
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
-@app.get("/api/pollux/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}})
+@app.get("/api/pollux/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Returns ranked commodity signals. Pass ?timeframe=1d for daily signals.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def signals(timeframe: str = Query(default="1d", description="Time window e.g. 1h, 1d, 1w")):
     """Pollux Signals — commodity prices and momentum signals."""
     all_signals = get_all_commodities()
@@ -262,7 +268,13 @@ def decision(request: DecisionRequest):
     )
 
 
-@app.get("/api/pollux/audit", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/pollux/audit", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Verify a prior decision outcome. Pass ?decision_id=X.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
     """Pollux Audit — verify prior decision outcome against real prices."""
     data = get_all_commodities()
@@ -288,7 +300,13 @@ def audit(decision_id: str = Query(..., description="Decision ID to audit"), win
     }
 
 
-@app.get("/api/pollux/forecast", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/pollux/forecast", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Get conformally-calibrated 80% price range. Pass ?symbol=Gold (XAU/USD).",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def forecast(symbol: str = Query(default="Gold (XAU/USD)", description="Commodity name e.g. Gold (XAU/USD)")):
     """Pollux Forecast — conformally-calibrated 80% price range."""
     sym = symbol
@@ -314,7 +332,13 @@ def forecast(symbol: str = Query(default="Gold (XAU/USD)", description="Commodit
     }
 
 
-@app.get("/api/pollux/risk", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/pollux/risk", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Current commodities market risk state and regime. No parameters required.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def risk():
     """Current commodities market risk state and cooldown context."""
     data = get_all_commodities()
@@ -355,7 +379,13 @@ def health():
 _decision_log: list[dict] = []
 
 
-@app.get("/api/pollux/preflight", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/pollux/preflight", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Check pre-decision conditions: cooldowns, market state, freshness. Pass ?symbol=Gold (XAU/USD).",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def preflight(symbol: str = Query(default="Gold (XAU/USD)", description="Commodity name e.g. Gold (XAU/USD)")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol
@@ -390,7 +420,13 @@ def preflight(symbol: str = Query(default="Gold (XAU/USD)", description="Commodi
     }
 
 
-@app.get("/api/pollux/history", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/pollux/history", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
+        "x-guidance": "Get recent context history. Pass ?symbol=Gold (XAU/USD)&limit=10.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
+    },
+)
 def history(symbol: str = Query(default="Gold (XAU/USD)", description="Commodity name e.g. Gold (XAU/USD)"), limit: int = Query(default=10, description="Max entries")):
     """Recent context history for analysis and audit support."""
     sym = symbol
