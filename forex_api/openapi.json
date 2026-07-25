@@ -204,19 +204,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "symbol": {"type": "string"},
-                    "ts": {"type": "string"},
-                    "can_decide": {"type": "boolean"},
-                    "cooldown_active": {"type": "boolean"},
-                    "market_state": {"type": "string"},
-                    "rate": {"type": "number"},
-                    "volatility": {"type": "string"},
-                    "warnings": {"type": "array", "items": {"type": "string"}},
-                    "data_freshness": {"type": "string"}
-                  },
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/PreflightResponse"
                 }
               }
             }
@@ -256,14 +244,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "symbol": {"type": "string"},
-                    "count": {"type": "integer"},
-                    "history": {"type": "array"},
-                    "data_freshness": {"type": "string"}
-                  },
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/HistoryResponse"
                 }
               }
             }
@@ -371,6 +352,31 @@
           "risk_level": {"type": "string"},
           "risk_factors": {"type": "array", "items": {"type": "string"}},
           "cooldown_active": {"type": "boolean"},
+          "data_freshness": {"type": "string"}
+        },
+        "additionalProperties": false
+      },
+      "PreflightResponse": {
+        "type": "object",
+        "properties": {
+          "symbol": {"type": "string"},
+          "ts": {"type": "string"},
+          "can_decide": {"type": "boolean"},
+          "cooldown_active": {"type": "boolean"},
+          "market_state": {"type": "string"},
+          "rate": {"type": "number"},
+          "volatility": {"type": "string"},
+          "warnings": {"type": "array", "items": {"type": "string"}},
+          "data_freshness": {"type": "string"}
+        },
+        "additionalProperties": false
+      },
+      "HistoryResponse": {
+        "type": "object",
+        "properties": {
+          "symbol": {"type": "string"},
+          "count": {"type": "integer"},
+          "history": {"type": "array"},
           "data_freshness": {"type": "string"}
         },
         "additionalProperties": false
