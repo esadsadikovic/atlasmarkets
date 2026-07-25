@@ -8,7 +8,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: FACILITATOR_URL
-        value: https://facilitator.payai.network
+        value: https://x402.xyz/facilitate
       - key: PYTHONUNBUFFERED
         value: "1"
 
@@ -21,7 +21,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: FACILITATOR_URL
-        value: https://facilitator.payai.network
+        value: https://x402.xyz/facilitate
       - key: PYTHONUNBUFFERED
         value: "1"
 
@@ -34,7 +34,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: FACILITATOR_URL
-        value: https://facilitator.payai.network
+        value: https://x402.xyz/facilitate
       - key: PYTHONUNBUFFERED
         value: "1"
 
@@ -47,7 +47,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: FACILITATOR_URL
-        value: https://facilitator.payai.network
+        value: https://x402.xyz/facilitate
       - key: PYTHONUNBUFFERED
         value: "1"
 
@@ -60,6 +60,6 @@ services:
     healthCheckPath: /health
     envVars:
       - key: FACILITATOR_URL
-        value: https://facilitator.payai.network
+        value: https://x402.xyz/facilitate
       - key: PYTHONUNBUFFERED
         value: "1"

@@ -11,6 +11,7 @@ from typing import Optional
 
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import requests
 
@@ -179,6 +180,12 @@ def regime_from_change(pct: float) -> str:
 
 def signal_score(pct: float) -> float:
     return round(max(-1, min(1, pct / 5)), 4)
+
+
+# —— OpenAPI spec (served from static file) ——————————————————————————
+@app.get("/openapi.json", include_in_schema=False)
+def get_openapi():
+    return FileResponse("openapi.json")
 
 
 # —— Endpoints —————————————————————————————————————————————————————————————————————
