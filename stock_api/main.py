@@ -163,13 +163,8 @@ def signal_score(pct: float) -> float:
 
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
-@app.get("/api/viking/signals", response_model=SignalsResponse,
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="1d", description="Time window e.g. 1h, 1d, 1w")
-    ]
-)
-def signals(timeframe: str = "1d"):
+@app.get("/api/viking/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}})
+def signals(timeframe: str = Query(default="1d", description="Time window e.g. 1h, 1d, 1w")):
     """Viking Signals — market context for S&P 500, Nasdaq, Dow, and major stocks."""
     tickers = ["SPY", "QQQ", "DIA", "AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"]
     result = {}
@@ -195,9 +190,7 @@ def signals(timeframe: str = "1d"):
     )
 
 
-@app.post("/api/viking/decision", response_model=DecisionResponse,
-    responses={"402": {"description": "Payment Required"}}
-)
+@app.post("/api/viking/decision", response_model=DecisionResponse, responses={"402": {"description": "Payment Required"}})
 def decision(request: DecisionRequest):
     """Viking Decision — BUY / SELL / HOLD with confidence for any ticker."""
     sym = request.symbol.upper()
@@ -235,14 +228,8 @@ def decision(request: DecisionRequest):
     )
 
 
-@app.get("/api/viking/audit",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(..., description="Decision ID to audit"),
-        Query(default="1h", description="Evaluation window e.g. 1h")
-    ]
-)
-def audit(decision_id: str, window: str = "1h"):
+@app.get("/api/viking/audit", responses={"402": {"description": "Payment Required"}})
+def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
     """Viking Audit — verify prior decision outcome against real prices."""
     q = get_stock_quote("SPY")
     entry_price = q["price"] if q else 450.0
@@ -269,13 +256,8 @@ def audit(decision_id: str, window: str = "1h"):
     }
 
 
-@app.get("/api/viking/forecast",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="SPY", description="Stock ticker e.g. AAPL, SPY")
-    ]
-)
-def forecast(symbol: str = "SPY"):
+@app.get("/api/viking/forecast", responses={"402": {"description": "Payment Required"}})
+def forecast(symbol: str = Query(default="SPY", description="Stock ticker e.g. AAPL, SPY")):
     """Viking Forecast — conformally-calibrated 80% price range."""
     sym = symbol.upper()
     q = get_stock_quote(sym)
@@ -300,9 +282,7 @@ def forecast(symbol: str = "SPY"):
     }
 
 
-@app.get("/api/viking/risk",
-    responses={"402": {"description": "Payment Required"}}
-)
+@app.get("/api/viking/risk", responses={"402": {"description": "Payment Required"}})
 def risk():
     """Current market risk state and cooldown context."""
     spy = get_stock_quote("SPY")
@@ -342,13 +322,8 @@ def health():
 _decision_log: list[dict] = []
 
 
-@app.get("/api/viking/preflight",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="SPY", description="Stock ticker e.g. AAPL")
-    ]
-)
-def preflight(symbol: str = "SPY"):
+@app.get("/api/viking/preflight", responses={"402": {"description": "Payment Required"}})
+def preflight(symbol: str = Query(default="SPY", description="Stock ticker e.g. AAPL")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     q = get_stock_quote(sym)
@@ -381,14 +356,8 @@ def preflight(symbol: str = "SPY"):
     }
 
 
-@app.get("/api/viking/history",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="SPY", description="Stock ticker e.g. AAPL"),
-        Query(default=10, description="Max entries")
-    ]
-)
-def history(symbol: str = "SPY", limit: int = 10):
+@app.get("/api/viking/history", responses={"402": {"description": "Payment Required"}})
+def history(symbol: str = Query(default="SPY", description="Stock ticker e.g. AAPL"), limit: int = Query(default=10, description="Max entries")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

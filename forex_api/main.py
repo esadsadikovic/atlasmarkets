@@ -182,13 +182,8 @@ def signal_score(pct: float) -> float:
 
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
-@app.get("/api/apollo/signals", response_model=SignalsResponse,
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="4h", description="Time window e.g. 15m, 1h, 1d, 4h")
-    ]
-)
-def signals(timeframe: str = "4h"):
+@app.get("/api/apollo/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}})
+def signals(timeframe: str = Query(default="4h", description="Time window e.g. 15m, 1h, 1d, 4h")):
     """Apollo Signals — forex pair rates and momentum signals."""
     all_signals = get_forex_signals()
     sorted_signals = sorted(all_signals.items(), key=lambda x: x[1], reverse=True)
@@ -205,9 +200,7 @@ def signals(timeframe: str = "4h"):
     )
 
 
-@app.post("/api/apollo/decision", response_model=DecisionResponse,
-    responses={"402": {"description": "Payment Required"}}
-)
+@app.post("/api/apollo/decision", response_model=DecisionResponse, responses={"402": {"description": "Payment Required"}})
 def decision(request: DecisionRequest):
     """Apollo Decision — BUY / SELL / HOLD for forex pair."""
     sym = request.symbol.upper()
@@ -241,14 +234,8 @@ def decision(request: DecisionRequest):
     )
 
 
-@app.get("/api/apollo/audit",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(..., description="Decision ID to audit"),
-        Query(default="1h", description="Evaluation window e.g. 1h")
-    ]
-)
-def audit(decision_id: str, window: str = "1h"):
+@app.get("/api/apollo/audit", responses={"402": {"description": "Payment Required"}})
+def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
     """Apollo Audit — verify prior decision outcome against real prices."""
     signals = get_forex_signals()
     entry_rate = signals.get("EURUSD", 1.08)
@@ -273,13 +260,8 @@ def audit(decision_id: str, window: str = "1h"):
     }
 
 
-@app.get("/api/apollo/forecast",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="EUR/USD", description="Forex pair e.g. EUR/USD, GBP/USD")
-    ]
-)
-def forecast(asset: str = "EUR/USD"):
+@app.get("/api/apollo/forecast", responses={"402": {"description": "Payment Required"}})
+def forecast(asset: str = Query(default="EUR/USD", description="Forex pair e.g. EUR/USD, GBP/USD")):
     """Apollo Forecast — conformally-calibrated 80% price range for forex pair."""
     sym = asset.upper().replace("/", "")
     signals = get_forex_signals()
@@ -304,9 +286,7 @@ def forecast(asset: str = "EUR/USD"):
     }
 
 
-@app.get("/api/apollo/risk",
-    responses={"402": {"description": "Payment Required"}}
-)
+@app.get("/api/apollo/risk", responses={"402": {"description": "Payment Required"}})
 def risk():
     """Current forex market risk state and cooldown context."""
     signals = get_forex_signals()
@@ -346,13 +326,8 @@ def health():
 _decision_log: list[dict] = []
 
 
-@app.get("/api/apollo/preflight",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="EUR/USD", description="Forex pair e.g. EUR/USD")
-    ]
-)
-def preflight(asset: str = "EUR/USD"):
+@app.get("/api/apollo/preflight", responses={"402": {"description": "Payment Required"}})
+def preflight(asset: str = Query(default="EUR/USD", description="Forex pair e.g. EUR/USD")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = asset.upper().replace("/", "")
     signals = get_forex_signals()
@@ -386,14 +361,8 @@ def preflight(asset: str = "EUR/USD"):
     }
 
 
-@app.get("/api/apollo/history",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="EUR/USD", description="Forex pair e.g. EUR/USD"),
-        Query(default=10, description="Max entries")
-    ]
-)
-def history(asset: str = "EUR/USD", limit: int = 10):
+@app.get("/api/apollo/history", responses={"402": {"description": "Payment Required"}})
+def history(asset: str = Query(default="EUR/USD", description="Forex pair e.g. EUR/USD"), limit: int = Query(default=10, description="Max entries")):
     """Recent context history for analysis and audit support."""
     sym = asset.upper().replace("/", "")
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

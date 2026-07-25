@@ -209,13 +209,8 @@ def signal_score(gwei: float) -> float:
 
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
-@app.get("/api/dagon/signals", response_model=SignalsResponse,
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="15m", description="Time window e.g. 15m, 1h, 1d")
-    ]
-)
-def signals(timeframe: str = "15m"):
+@app.get("/api/dagon/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}})
+def signals(timeframe: str = Query(default="15m", description="Time window e.g. 15m, 1h, 1d")):
     """Dagon Signals — ETH gas, BTC fees, DeFi TVL, whale alerts."""
     gas = get_eth_gas()
     fees = get_btc_fees()
@@ -240,9 +235,7 @@ def signals(timeframe: str = "15m"):
     )
 
 
-@app.post("/api/dagon/decision", response_model=DecisionResponse,
-    responses={"402": {"description": "Payment Required"}}
-)
+@app.post("/api/dagon/decision", response_model=DecisionResponse, responses={"402": {"description": "Payment Required"}})
 def decision(request: DecisionRequest):
     """Dagon Decision — whether to interact on-chain now."""
     sym = request.symbol.upper()
@@ -283,14 +276,8 @@ def decision(request: DecisionRequest):
     )
 
 
-@app.get("/api/dagon/audit",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(..., description="Decision ID to audit"),
-        Query(default="1h", description="Evaluation window e.g. 1h")
-    ]
-)
-def audit(decision_id: str, window: str = "1h"):
+@app.get("/api/dagon/audit", responses={"402": {"description": "Payment Required"}})
+def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
     """Dagon Audit — verify prior decision outcome against real on-chain conditions."""
     gas = get_eth_gas()
     entry_gwei = gas["propose_gwei"]
@@ -315,13 +302,8 @@ def audit(decision_id: str, window: str = "1h"):
     }
 
 
-@app.get("/api/dagon/forecast",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="ETH", description="ETH or BTC")
-    ]
-)
-def forecast(symbol: str = "ETH"):
+@app.get("/api/dagon/forecast", responses={"402": {"description": "Payment Required"}})
+def forecast(symbol: str = Query(default="ETH", description="ETH or BTC")):
     """Dagon Forecast — conformally-calibrated 80% gas fee range."""
     sym = symbol.upper()
     gas = get_eth_gas()
@@ -346,9 +328,7 @@ def forecast(symbol: str = "ETH"):
     }
 
 
-@app.get("/api/dagon/risk",
-    responses={"402": {"description": "Payment Required"}}
-)
+@app.get("/api/dagon/risk", responses={"402": {"description": "Payment Required"}})
 def risk():
     """Current on-chain risk state and cooldown context."""
     gas = get_eth_gas()
@@ -387,13 +367,8 @@ def health():
 _decision_log: list[dict] = []
 
 
-@app.get("/api/dagon/preflight",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="ETH", description="ETH or BTC")
-    ]
-)
-def preflight(symbol: str = "ETH"):
+@app.get("/api/dagon/preflight", responses={"402": {"description": "Payment Required"}})
+def preflight(symbol: str = Query(default="ETH", description="ETH or BTC")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     gas = get_eth_gas()
@@ -425,14 +400,8 @@ def preflight(symbol: str = "ETH"):
     }
 
 
-@app.get("/api/dagon/history",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="ETH", description="ETH or BTC"),
-        Query(default=10, description="Max entries")
-    ]
-)
-def history(symbol: str = "ETH", limit: int = 10):
+@app.get("/api/dagon/history", responses={"402": {"description": "Payment Required"}})
+def history(symbol: str = Query(default="ETH", description="ETH or BTC"), limit: int = Query(default=10, description="Max entries")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

@@ -174,13 +174,8 @@ def signal_score(pct_24h: float) -> float:
 
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
-@app.get("/api/anubis/signals", response_model=SignalsResponse,
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="15m", description="Time window e.g. 15m, 1h, 1d")
-    ]
-)
-def signals(timeframe: str = "15m"):
+@app.get("/api/anubis/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}})
+def signals(timeframe: str = Query(default="15m", description="Time window e.g. 15m, 1h, 1d")):
     """Anubis Signals — market context, score details, and freshness."""
     symbols = ["BTC", "ETH", "SOL", "XRP", "ADA"]
     result = {}
@@ -205,9 +200,7 @@ def signals(timeframe: str = "15m"):
     )
 
 
-@app.post("/api/anubis/decision", response_model=DecisionResponse,
-    responses={"402": {"description": "Payment Required"}}
-)
+@app.post("/api/anubis/decision", response_model=DecisionResponse, responses={"402": {"description": "Payment Required"}})
 def decision(request: DecisionRequest):
     """Anubis Decision — probabilistic journal entry with decision_id."""
     sym = request.symbol.upper()
@@ -244,14 +237,8 @@ def decision(request: DecisionRequest):
     )
 
 
-@app.get("/api/anubis/audit",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(..., description="Decision ID to audit"),
-        Query(default="1h", description="Evaluation window e.g. 1h")
-    ]
-)
-def audit(decision_id: str, window: str = "1h"):
+@app.get("/api/anubis/audit", responses={"402": {"description": "Payment Required"}})
+def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
     """Anubis Audit — verify prior decision outcome against real prices."""
     data = get_crypto_price("btc")
     entry_price = data["price"] if data else 67000.0
@@ -278,13 +265,8 @@ def audit(decision_id: str, window: str = "1h"):
     }
 
 
-@app.get("/api/anubis/forecast",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="BTC", description="Symbol e.g. BTC, ETH")
-    ]
-)
-def forecast(symbol: str = "BTC"):
+@app.get("/api/anubis/forecast", responses={"402": {"description": "Payment Required"}})
+def forecast(symbol: str = Query(default="BTC", description="Symbol e.g. BTC, ETH")):
     """Anubis Forecast — conformally-calibrated 80% price range."""
     sym = symbol.upper()
     data = get_crypto_price(sym.lower())
@@ -310,9 +292,7 @@ def forecast(symbol: str = "BTC"):
     }
 
 
-@app.get("/api/anubis/risk",
-    responses={"402": {"description": "Payment Required"}}
-)
+@app.get("/api/anubis/risk", responses={"402": {"description": "Payment Required"}})
 def risk():
     """Current market risk state and cooldown context."""
     data = get_crypto_price("btc")
@@ -352,13 +332,8 @@ def health():
 _decision_log: list[dict] = []
 
 
-@app.get("/api/anubis/preflight",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="BTC", description="Symbol e.g. BTC")
-    ]
-)
-def preflight(symbol: str = "BTC"):
+@app.get("/api/anubis/preflight", responses={"402": {"description": "Payment Required"}})
+def preflight(symbol: str = Query(default="BTC", description="Symbol e.g. BTC")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
     data = get_crypto_price(sym.lower())
@@ -391,14 +366,8 @@ def preflight(symbol: str = "BTC"):
     }
 
 
-@app.get("/api/anubis/history",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="BTC", description="Symbol e.g. BTC"),
-        Query(default=10, description="Max entries")
-    ]
-)
-def history(symbol: str = "BTC", limit: int = 10):
+@app.get("/api/anubis/history", responses={"402": {"description": "Payment Required"}})
+def history(symbol: str = Query(default="BTC", description="Symbol e.g. BTC"), limit: int = Query(default=10, description="Max entries")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]

@@ -183,13 +183,8 @@ def signal_score(pct: float) -> float:
 
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
-@app.get("/api/pollux/signals", response_model=SignalsResponse,
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="1d", description="Time window e.g. 1h, 1d, 1w")
-    ]
-)
-def signals(timeframe: str = "1d"):
+@app.get("/api/pollux/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}})
+def signals(timeframe: str = Query(default="1d", description="Time window e.g. 1h, 1d, 1w")):
     """Pollux Signals — commodity prices and momentum signals."""
     all_signals = get_all_commodities()
     sorted_signals = sorted(all_signals.items(), key=lambda x: x[1], reverse=True)
@@ -206,9 +201,7 @@ def signals(timeframe: str = "1d"):
     )
 
 
-@app.post("/api/pollux/decision", response_model=DecisionResponse,
-    responses={"402": {"description": "Payment Required"}}
-)
+@app.post("/api/pollux/decision", response_model=DecisionResponse, responses={"402": {"description": "Payment Required"}})
 def decision(request: DecisionRequest):
     """Pollux Decision — BUY / SELL / HOLD for commodities."""
     sym = request.symbol
@@ -242,14 +235,8 @@ def decision(request: DecisionRequest):
     )
 
 
-@app.get("/api/pollux/audit",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(..., description="Decision ID to audit"),
-        Query(default="1h", description="Evaluation window e.g. 1h")
-    ]
-)
-def audit(decision_id: str, window: str = "1h"):
+@app.get("/api/pollux/audit", responses={"402": {"description": "Payment Required"}})
+def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
     """Pollux Audit — verify prior decision outcome against real prices."""
     data = get_all_commodities()
     entry_price = data.get("Gold (XAU/USD)", 2000.0)
@@ -274,13 +261,8 @@ def audit(decision_id: str, window: str = "1h"):
     }
 
 
-@app.get("/api/pollux/forecast",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="Gold (XAU/USD)", description="Commodity name e.g. Gold (XAU/USD)")
-    ]
-)
-def forecast(symbol: str = "Gold (XAU/USD)"):
+@app.get("/api/pollux/forecast", responses={"402": {"description": "Payment Required"}})
+def forecast(symbol: str = Query(default="Gold (XAU/USD)", description="Commodity name e.g. Gold (XAU/USD)")):
     """Pollux Forecast — conformally-calibrated 80% price range."""
     sym = symbol
     data = get_all_commodities()
@@ -305,9 +287,7 @@ def forecast(symbol: str = "Gold (XAU/USD)"):
     }
 
 
-@app.get("/api/pollux/risk",
-    responses={"402": {"description": "Payment Required"}}
-)
+@app.get("/api/pollux/risk", responses={"402": {"description": "Payment Required"}})
 def risk():
     """Current commodities market risk state and cooldown context."""
     data = get_all_commodities()
@@ -347,13 +327,8 @@ def health():
 _decision_log: list[dict] = []
 
 
-@app.get("/api/pollux/preflight",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="Gold (XAU/USD)", description="Commodity name e.g. Gold (XAU/USD)")
-    ]
-)
-def preflight(symbol: str = "Gold (XAU/USD)"):
+@app.get("/api/pollux/preflight", responses={"402": {"description": "Payment Required"}})
+def preflight(symbol: str = Query(default="Gold (XAU/USD)", description="Commodity name e.g. Gold (XAU/USD)")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol
     data = get_all_commodities()
@@ -387,14 +362,8 @@ def preflight(symbol: str = "Gold (XAU/USD)"):
     }
 
 
-@app.get("/api/pollux/history",
-    responses={"402": {"description": "Payment Required"}},
-    parameters=[
-        Query(default="Gold (XAU/USD)", description="Commodity name e.g. Gold (XAU/USD)"),
-        Query(default=10, description="Max entries")
-    ]
-)
-def history(symbol: str = "Gold (XAU/USD)", limit: int = 10):
+@app.get("/api/pollux/history", responses={"402": {"description": "Payment Required"}})
+def history(symbol: str = Query(default="Gold (XAU/USD)", description="Commodity name e.g. Gold (XAU/USD)"), limit: int = Query(default=10, description="Max entries")):
     """Recent context history for analysis and audit support."""
     sym = symbol
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]
