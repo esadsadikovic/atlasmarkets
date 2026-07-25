@@ -8,6 +8,8 @@ COPY . .
 
 ENV PYTHONUNBUFFERED=1
 
-EXPOSE 8002
+ENV PORT=10000
 
-CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8002}
+EXPOSE 10000
+
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-10000}

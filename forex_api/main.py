@@ -58,7 +58,7 @@ _ROUTES = {
     }.items()
 }
 
-app.add_middleware(payment_middleware, _routes=_ROUTES, _x402_server=_x402_server)
+app.add_middleware(payment_middleware(_ROUTES, _x402_server))
 
 app.add_middleware(
     CORSMiddleware,
