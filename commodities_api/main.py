@@ -11,7 +11,7 @@ from typing import Optional
 
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+
 from pydantic import BaseModel
 import requests
 
@@ -20,12 +20,20 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 from x402.extensions.bazaar import bazaar_resource_server_extension
+from x402.schemas.responses import SupportedKind, SupportedResponse
 
 app = FastAPI(
     title="AtlasMarkets — Pollux",
     version="1.0.0",
-    contact={"email": "max.sadikovic@gmail.com"},
+    description="commodities market intelligence for AI agents. x402-protected on Base mainnet.",
 )
+
+@app.get("/openapi.json", include_in_schema=False)
+def get_openapi():
+    spec = app.openapi()
+    spec["info"]["x-guidance"] = "AtlasMarkets Pollux provides commodities market intelligence for AI agents. Routes vary by endpoint — see each operation for pricing. x402 payment required for all protected routes."
+    spec["info"]["contact"] = {"email": "max.sadikovic@gmail.com"}
+    return spec
 
 # —— x402 payment middleware —————————————————————————————————————————————————————
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -59,9 +67,26 @@ _ROUTES = {
     }.items()
 }
 
+# Pre-populate facilitator support for Base mainnet (avoids Cloudflare-blocked init)
+_x402_server._supported_responses = {
+    "eip155:8453": {
+        "exact": SupportedResponse(
+            kinds=[
+                SupportedKind(x402_version=2, scheme="exact", network="eip155:8453", extra={}),
+            ],
+            extensions=["bazaar"],
+            signers={},
+        )
+    }
+}
+_x402_server._initialized = True
+
 @app.middleware("http")
 async def x402_mw(request: Request, call_next):
-    return await payment_middleware(_ROUTES, _x402_server)(request, call_next)
+    return await payment_middleware(
+        _ROUTES, _x402_server,
+        sync_facilitator_on_start=False,
+    )(request, call_next)
 
 app.add_middleware(
     CORSMiddleware,
@@ -183,11 +208,6 @@ def signal_score(pct: float) -> float:
 
 
 # —— OpenAPI spec (served from static file) ——————————————————————————
-@app.get("/openapi.json", include_in_schema=False)
-def get_openapi():
-    return FileResponse("openapi.json")
-
-
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
 @app.get("/api/pollux/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}})
@@ -324,7 +344,8 @@ def risk():
 
 # —— Health —————————————————————————————————————————————————————————————————————————————
 
-@app.get("/health", responses={"200": {"description": "Service is healthy"}})
+@app.get("/health", responses={"200": {"description": "Service is healthy"}},
+    openapi_extra={"security": []},)
 def health():
     return {"status": "ok", "service": "atlasmarkets-commodities", "version": "1.0.0"}
 

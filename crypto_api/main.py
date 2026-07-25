@@ -20,12 +20,21 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 from x402.extensions.bazaar import bazaar_resource_server_extension
+from x402.schemas.responses import SupportedKind, SupportedResponse
 
 app = FastAPI(
     title="AtlasMarkets — Anubis",
     version="1.0.0",
-    contact={"email": "max.sadikovic@gmail.com"},
+    description="Crypto market intelligence for AI agents. x402-protected on Base mainnet.",
 )
+
+# Inject info.x-guidance and info.contact into the auto-generated OpenAPI spec
+@app.get("/openapi.json", include_in_schema=False)
+def get_openapi():
+    spec = app.openapi()
+    spec["info"]["x-guidance"] = "AtlasMarkets Anubis provides crypto market intelligence for AI agents. Routes: GET /api/anubis/signals ($0.05), GET /api/anubis/forecast?symbol=BTC ($0.05), GET /api/anubis/risk ($0.02), GET /api/anubis/preflight?symbol=BTC ($0.05), GET /api/anubis/history?symbol=BTC ($0.05), GET /api/anubis/audit?decision_id=X ($0.07), POST /api/anubis/decision ($0.15). All routes return real-time crypto data."
+    spec["info"]["contact"] = {"email": "max.sadikovic@gmail.com"}
+    return spec
 
 # —— x402 payment middleware —————————————————————————————————————————————————————
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
@@ -59,9 +68,28 @@ _ROUTES = {
     }.items()
 }
 
+# Pre-populate facilitator support for Base mainnet to avoid Cloudflare-blocked
+# initializer call at startup. The exact scheme for eip155:8453 is well-known.
+_x402_server._supported_responses = {
+    "eip155:8453": {
+        "exact": SupportedResponse(
+            kinds=[
+                SupportedKind(x402_version=2, scheme="exact", network="eip155:8453", extra={}),
+            ],
+            extensions=["bazaar"],
+            signers={},
+        )
+    }
+}
+_x402_server._initialized = True
+
+
 @app.middleware("http")
 async def x402_mw(request: Request, call_next):
-    return await payment_middleware(_ROUTES, _x402_server)(request, call_next)
+    return await payment_middleware(
+        _ROUTES, _x402_server,
+        sync_facilitator_on_start=False,  # avoid Cloudflare on startup
+    )(request, call_next)
 
 app.add_middleware(
     CORSMiddleware,
@@ -172,15 +200,17 @@ def signal_score(pct_24h: float) -> float:
     return round(max(-1, min(1, pct_24h / 10)), 4)
 
 
-# —— OpenAPI spec (served from static file) ——————————————————————————
-@app.get("/openapi.json", include_in_schema=False)
-def get_openapi():
-    return FileResponse("openapi.json")
-
-
 # —— Endpoints —————————————————————————————————————————————————————————————————————
 
-@app.get("/api/anubis/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}})
+@app.get("/api/anubis/signals", response_model=SignalsResponse, responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {
+            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
+            "protocols": [{"x402": {}}],
+        },
+        "x-guidance": "Returns current crypto market regime and top signals. Pass ?timeframe=15m for short-term signals.",
+    },
+)
 def signals(timeframe: str = Query(default="15m", description="Time window e.g. 15m, 1h, 1d")):
     """Anubis Signals — market context, score details, and freshness."""
     symbols = ["BTC", "ETH", "SOL", "XRP", "ADA"]
@@ -206,7 +236,15 @@ def signals(timeframe: str = Query(default="15m", description="Time window e.g. 
     )
 
 
-@app.post("/api/anubis/decision", response_model=DecisionResponse, responses={"402": {"description": "Payment Required"}})
+@app.post("/api/anubis/decision", response_model=DecisionResponse, responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {
+            "price": {"mode": "fixed", "currency": "USD", "amount": "0.150000"},
+            "protocols": [{"x402": {}}],
+        },
+        "x-guidance": "POST a symbol to get a probabilistic market decision. Include JSON body: {\"symbol\": \"BTC\"}.",
+    },
+)
 def decision(request: DecisionRequest):
     """Anubis Decision — probabilistic journal entry with decision_id."""
     sym = request.symbol.upper()
@@ -243,7 +281,15 @@ def decision(request: DecisionRequest):
     )
 
 
-@app.get("/api/anubis/audit", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/anubis/audit", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {
+            "price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"},
+            "protocols": [{"x402": {}}],
+        },
+        "x-guidance": "Audit a prior decision outcome. Pass ?decision_id=X to verify against real prices.",
+    },
+)
 def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
     """Anubis Audit — verify prior decision outcome against real prices."""
     data = get_crypto_price("btc")
@@ -271,7 +317,15 @@ def audit(decision_id: str = Query(..., description="Decision ID to audit"), win
     }
 
 
-@app.get("/api/anubis/forecast", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/anubis/forecast", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {
+            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
+            "protocols": [{"x402": {}}],
+        },
+        "x-guidance": "Get conformally-calibrated 80% price range. Pass ?symbol=BTC to specify asset.",
+    },
+)
 def forecast(symbol: str = Query(default="BTC", description="Symbol e.g. BTC, ETH")):
     """Anubis Forecast — conformally-calibrated 80% price range."""
     sym = symbol.upper()
@@ -298,7 +352,15 @@ def forecast(symbol: str = Query(default="BTC", description="Symbol e.g. BTC, ET
     }
 
 
-@app.get("/api/anubis/risk", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/anubis/risk", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {
+            "price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"},
+            "protocols": [{"x402": {}}],
+        },
+        "x-guidance": "Returns current market risk state, regime, and cooldown context. No parameters required.",
+    },
+)
 def risk():
     """Current market risk state and cooldown context."""
     data = get_crypto_price("btc")
@@ -328,7 +390,9 @@ def risk():
 
 # —— Health —————————————————————————————————————————————————————————————————————————————
 
-@app.get("/health", responses={"200": {"description": "Service is healthy"}})
+@app.get("/health", responses={"200": {"description": "Service is healthy"}},
+    openapi_extra={"security": []},
+)
 def health():
     return {"status": "ok", "service": "atlasmarkets-crypto", "version": "1.0.0"}
 
@@ -338,7 +402,15 @@ def health():
 _decision_log: list[dict] = []
 
 
-@app.get("/api/anubis/preflight", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/anubis/preflight", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {
+            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
+            "protocols": [{"x402": {}}],
+        },
+        "x-guidance": "Check pre-decision conditions: cooldowns, market state, freshness, warnings. Pass ?symbol=BTC to check a specific asset.",
+    },
+)
 def preflight(symbol: str = Query(default="BTC", description="Symbol e.g. BTC")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
     sym = symbol.upper()
@@ -372,7 +444,15 @@ def preflight(symbol: str = Query(default="BTC", description="Symbol e.g. BTC"))
     }
 
 
-@app.get("/api/anubis/history", responses={"402": {"description": "Payment Required"}})
+@app.get("/api/anubis/history", responses={"402": {"description": "Payment Required"}},
+    openapi_extra={
+        "x-payment-info": {
+            "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
+            "protocols": [{"x402": {}}],
+        },
+        "x-guidance": "Get recent context history for analysis. Pass ?symbol=BTC&limit=10 to filter results.",
+    },
+)
 def history(symbol: str = Query(default="BTC", description="Symbol e.g. BTC"), limit: int = Query(default=10, description="Max entries")):
     """Recent context history for analysis and audit support."""
     sym = symbol.upper()
