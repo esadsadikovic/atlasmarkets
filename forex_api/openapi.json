@@ -1,26 +1,26 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "AtlasMarkets — Anubis",
+    "title": "AtlasMarkets — Apollo",
     "version": "1.0.0",
-    "description": "Crypto market intelligence for AI agents. x402-protected on Base mainnet.",
-    "x-guidance": "AtlasMarkets Anubis provides crypto market intelligence for AI agents. Routes: GET /api/anubis/signals ($0.05), GET /api/anubis/forecast?symbol=BTC ($0.05), GET /api/anubis/risk ($0.02), GET /api/anubis/preflight?symbol=BTC ($0.05), GET /api/anubis/history?symbol=BTC ($0.05), GET /api/anubis/audit?decision_id=X ($0.07), POST /api/anubis/decision?symbol=BTC ($0.15). All routes return real-time crypto data.",
+    "description": "Forex market intelligence for AI agents. x402-protected on Base mainnet.",
+    "x-guidance": "AtlasMarkets Apollo provides forex market intelligence for AI agents. Routes: GET /api/apollo/signals ($0.05), GET /api/apollo/forecast?asset=EUR/USD ($0.05), GET /api/apollo/risk ($0.02), GET /api/apollo/preflight?asset=EUR/USD ($0.05), GET /api/apollo/history?asset=EUR/USD ($0.05), GET /api/apollo/audit?decision_id=X ($0.07), POST /api/apollo/decision?symbol=EUR/USD ($0.15). All routes return real-time forex data.",
     "contact": {
       "email": "max.sadikovic@gmail.com"
     }
   },
   "servers": [
     {
-      "url": "https://atlasmarkets-production-2888.up.railway.app",
+      "url": "https://athletic-endurance-production-bef1.up.railway.app",
       "description": "Production"
     }
   ],
   "paths": {
-    "/api/anubis/signals": {
+    "/api/apollo/signals": {
       "get": {
-        "operationId": "getAnubisSignals",
-        "tags": ["Crypto", "Intelligence", "Signals"],
-        "summary": "Current crypto market signals",
+        "operationId": "getApolloSignals",
+        "tags": ["Forex", "Intelligence", "Signals"],
+        "summary": "Current forex market signals",
         "x-payment-info": {
           "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
           "protocols": [{"x402": {}}]
@@ -30,8 +30,8 @@
             "name": "timeframe",
             "in": "query",
             "required": false,
-            "schema": {"type": "string", "default": "15m"},
-            "description": "Time window e.g. 15m, 1h, 1d"
+            "schema": {"type": "string", "default": "4h"},
+            "description": "Time window e.g. 15m, 1h, 1d, 4h"
           }
         ],
         "responses": {
@@ -59,11 +59,11 @@
         }
       }
     },
-    "/api/anubis/decision": {
+    "/api/apollo/decision": {
       "post": {
-        "operationId": "postAnubisDecision",
-        "tags": ["Crypto", "Decision"],
-        "summary": "Make a crypto market decision",
+        "operationId": "postApolloDecision",
+        "tags": ["Forex", "Decision"],
+        "summary": "Make a forex market decision",
         "x-payment-info": {
           "price": {"mode": "fixed", "currency": "USD", "amount": "0.150000"},
           "protocols": [{"x402": {}}]
@@ -76,7 +76,7 @@
                 "type": "object",
                 "required": ["symbol"],
                 "properties": {
-                  "symbol": {"type": "string", "description": "Crypto symbol e.g. BTC, ETH"}
+                  "symbol": {"type": "string", "description": "Forex pair e.g. EURUSD, GBPUSD, USDJPY"}
                 },
                 "additionalProperties": false
               }
@@ -112,10 +112,10 @@
         }
       }
     },
-    "/api/anubis/audit": {
+    "/api/apollo/audit": {
       "get": {
-        "operationId": "getAnubisAudit",
-        "tags": ["Crypto", "Audit"],
+        "operationId": "getApolloAudit",
+        "tags": ["Forex", "Audit"],
         "summary": "Audit a prior decision",
         "x-payment-info": {
           "price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"},
@@ -162,10 +162,10 @@
         }
       }
     },
-    "/api/anubis/forecast": {
+    "/api/apollo/forecast": {
       "get": {
-        "operationId": "getAnubisForecast",
-        "tags": ["Crypto", "Forecast"],
+        "operationId": "getApolloForecast",
+        "tags": ["Forex", "Forecast"],
         "summary": "Conformally-calibrated price forecast",
         "x-payment-info": {
           "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
@@ -173,11 +173,11 @@
         },
         "parameters": [
           {
-            "name": "symbol",
+            "name": "asset",
             "in": "query",
             "required": false,
-            "schema": {"type": "string", "default": "BTC"},
-            "description": "Symbol e.g. BTC, ETH"
+            "schema": {"type": "string", "default": "EUR/USD"},
+            "description": "Forex pair e.g. EUR/USD, GBP/USD"
           }
         ],
         "responses": {
@@ -203,10 +203,10 @@
         }
       }
     },
-    "/api/anubis/risk": {
+    "/api/apollo/risk": {
       "get": {
-        "operationId": "getAnubisRisk",
-        "tags": ["Crypto", "Risk"],
+        "operationId": "getApolloRisk",
+        "tags": ["Forex", "Risk"],
         "summary": "Current market risk state",
         "x-payment-info": {
           "price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"},
@@ -236,10 +236,10 @@
         }
       }
     },
-    "/api/anubis/preflight": {
+    "/api/apollo/preflight": {
       "get": {
-        "operationId": "getAnubisPreflight",
-        "tags": ["Crypto", "Preflight"],
+        "operationId": "getApolloPreflight",
+        "tags": ["Forex", "Preflight"],
         "summary": "Pre-decision conditions check",
         "x-payment-info": {
           "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
@@ -247,11 +247,11 @@
         },
         "parameters": [
           {
-            "name": "symbol",
+            "name": "asset",
             "in": "query",
             "required": false,
-            "schema": {"type": "string", "default": "BTC"},
-            "description": "Symbol e.g. BTC"
+            "schema": {"type": "string", "default": "EUR/USD"},
+            "description": "Forex pair e.g. EUR/USD"
           }
         ],
         "responses": {
@@ -267,7 +267,7 @@
                     "can_decide": {"type": "boolean"},
                     "cooldown_active": {"type": "boolean"},
                     "market_state": {"type": "string"},
-                    "price": {"type": "number"},
+                    "rate": {"type": "number"},
                     "volatility": {"type": "string"},
                     "warnings": {"type": "array", "items": {"type": "string"}},
                     "data_freshness": {"type": "string"}
@@ -281,10 +281,10 @@
         }
       }
     },
-    "/api/anubis/history": {
+    "/api/apollo/history": {
       "get": {
-        "operationId": "getAnubisHistory",
-        "tags": ["Crypto", "History"],
+        "operationId": "getApolloHistory",
+        "tags": ["Forex", "History"],
         "summary": "Recent context history",
         "x-payment-info": {
           "price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"},
@@ -292,11 +292,11 @@
         },
         "parameters": [
           {
-            "name": "symbol",
+            "name": "asset",
             "in": "query",
             "required": false,
-            "schema": {"type": "string", "default": "BTC"},
-            "description": "Symbol e.g. BTC"
+            "schema": {"type": "string", "default": "EUR/USD"},
+            "description": "Forex pair e.g. EUR/USD"
           },
           {
             "name": "limit",
@@ -363,7 +363,7 @@
     "extensions": {
       "bazaar": {
         "status": "live",
-        "purpose": "AtlasMarkets Anubis crypto market intelligence for AI agents."
+        "purpose": "AtlasMarkets Apollo forex market intelligence for AI agents."
       }
     }
   }

@@ -37,7 +37,7 @@ app = FastAPI(
     },
 )
 
-# ── Root-level OpenAPI extensions ─────────────────────────────────────────────
+# —— Root-level OpenAPI extensions ————————————————————————————————————————————————
 _orig_openapi = app.openapi
 
 def _patched_openapi():
@@ -52,7 +52,7 @@ def _patched_openapi():
     schema["x-x402"] = {
         "network": "eip155:8453",
         "payTo": "0x8eB96caA976De43027FEf619c4D24F6679486277",
-        "facilitator": "https://facilitator.payai.network",
+        "facilitator": "https://x402.xyz/facilitate",
         "extensions": {
             "bazaar": {
                 "status": "live",
@@ -60,11 +60,20 @@ def _patched_openapi():
             }
         },
     }
+    schema["components"] = schema.get("components", {})
+    schema["components"]["securitySchemes"] = {
+        "siwx": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "SIWX",
+            "description": "Sign-In with X (SIWX) wallet authentication"
+        }
+    }
     return schema
 
 app.openapi = _patched_openapi
 
-# ── x402 payment middleware ──────────────────────────────────────────────────
+# —— x402 payment middleware —————————————————————————————————————————————————————
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
 FACILITATOR_URL = os.environ.get("FACILITATOR_URL", "https://x402.xyz/facilitate")
 NETWORK = "eip155:8453"
@@ -108,7 +117,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── Free data helpers ───────────────────────────────────────────────────────
+# —— Free data helpers —————————————————————————————————————————————————————————————
 
 def get_stock_quote(symbol: str) -> Optional[dict]:
     """Fetch real stock quote using Yahoo Finance unofficial endpoint (free, no key)."""
@@ -133,7 +142,7 @@ def get_index_quote(idx: str) -> Optional[dict]:
     return get_stock_quote(idx)
 
 
-# ─── Response models ─────────────────────────────────────────────────────────
+# —— Response models ———————————————————————————————————————————————————————————————
 
 class SignalsResponse(BaseModel):
     ts: str
@@ -186,7 +195,13 @@ class RiskResponse(BaseModel):
     data_freshness: str
 
 
-# ─── Regime helpers ──────────────────────────────────────────────────────────
+# —— Request models for POST endpoints ———————————————————————————————————————
+
+class DecisionRequest(BaseModel):
+    symbol: str = "SPY"
+
+
+# —— Regime helpers —————————————————————————————————————————————————————————————
 
 def regime_from_change(pct: float) -> str:
     if pct > 0.015:  return "bullish"
@@ -198,7 +213,7 @@ def signal_score(pct: float) -> float:
     return round(max(-1, min(1, pct / 5)), 4)
 
 
-# ─── Endpoints ──────────────────────────────────────────────────────────────
+# —— Endpoints —————————————————————————————————————————————————————————————————————
 
 @app.get("/api/viking/signals", response_model=SignalsResponse,
     openapi_extra={
@@ -342,9 +357,9 @@ def signals(timeframe: str = "1d"):
         "402": {"description": "Payment Required"}
     }
 )
-def decision(symbol: str = Query(default="SPY", description="Stock ticker e.g. SPY, QQQ, AAPL")):
+def decision(request: DecisionRequest):
     """Viking Decision — BUY / SELL / HOLD with confidence for any ticker."""
-    sym = symbol.upper()
+    sym = request.symbol.upper()
     q = get_stock_quote(sym)
     price = q["price"] if q else 450.0
     pct = q["change_pct"] if q else 0.0
@@ -440,12 +455,13 @@ def decision(symbol: str = Query(default="SPY", description="Stock ticker e.g. S
         "402": {"description": "Payment Required"}
     }
 )
-def audit(decision_id: str, window: str = "1d"):
-    """Viking Audit — verify prior decision against real price movement."""
+def audit(decision_id: str, window: str = "1h"):
+    """Viking Audit — verify prior decision outcome against real prices."""
     q = get_stock_quote("SPY")
-    entry_price = q["price"] if q else 540.0
+    entry_price = q["price"] if q else 450.0
 
-    exit_price = entry_price * (1 + random.uniform(-0.02, 0.012))
+    # Simulate audit
+    exit_price = entry_price * (1 + random.uniform(-0.02, 0.015))
     pnl_pct = (exit_price - entry_price) / entry_price
 
     return {
@@ -477,7 +493,7 @@ def audit(decision_id: str, window: str = "1d"):
                 "properties": {
                     "input": {
                         "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL"}}
+                        "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. AAPL, SPY"}}
                     },
                     "output": {
                         "type": "object",
@@ -520,12 +536,10 @@ def forecast(symbol: str = "SPY"):
     """Viking Forecast — conformally-calibrated 80% price range."""
     sym = symbol.upper()
     q = get_stock_quote(sym)
-    price = q["price"] if q else 540.0
-    pct = q["change_pct"] if q else 0.0
-    regime = regime_from_change(pct)
+    price = q["price"] if q else 450.0
+    regime = regime_from_change(q["change_pct"] if q else 0.0)
 
-    # 80% coverage — ~1.28 sigma for normal distribution
-    vol = price * 0.015  # 1.5% daily vol assumption
+    vol = price * 0.025  # 2.5% vol assumption for stocks
     return {
         "symbol": sym,
         "ts": datetime.now(timezone.utc).isoformat(),
@@ -552,7 +566,10 @@ def forecast(symbol: str = "SPY"):
         "x-bazaar": {
             "schema": {
                 "properties": {
-                    "input": {"type": "object", "properties": {}},
+                    "input": {
+                        "type": "object",
+                        "properties": {}
+                    },
                     "output": {
                         "type": "object",
                         "properties": {
@@ -592,16 +609,14 @@ def forecast(symbol: str = "SPY"):
     }
 )
 def risk():
-    """Current market risk state — S&P 500 regime and risk factors."""
-    q = get_stock_quote("SPY")
-    spy_pct = q["change_pct"] if q else 0.0
-    qqq = get_stock_quote("QQQ")
-    qqq_pct = qqq["change_pct"] if qqq else 0.0
+    """Current market risk state and cooldown context."""
+    spy = get_stock_quote("SPY")
+    spy_change = spy["change_pct"] if spy else 0.0
 
-    regime = regime_from_change(spy_pct)
-    if abs(spy_pct) > 0.02 or abs(qqq_pct) > 0.025:
+    regime = regime_from_change(spy_change)
+    if abs(spy_change) > 0.03:
         risk_level = "HIGH"
-    elif abs(spy_pct) > 0.01 or abs(qqq_pct) > 0.012:
+    elif abs(spy_change) > 0.015:
         risk_level = "ELEVATED"
     else:
         risk_level = "NORMAL"
@@ -611,21 +626,23 @@ def risk():
         regime=regime,
         risk_level=risk_level,
         risk_factors=[
-            "S&P 500 breadth narrowing" if spy_pct < qqq_pct else "S&P 500 breadth expanding",
-            "Tech outperformance diverging" if qqq_pct > spy_pct else "Value rotation building",
-            "VIX elevated — caution warranted" if regime == "chop" else "Momentum regime active",
+            "VIX at normal levels",
+            "Fed policy uncertainty low",
+            "Earnings season mixed",
         ],
         cooldown_active=False,
         data_freshness="FRESH",
     )
 
 
-# ─── Health ──────────────────────────────────────────────────────────────────
+# —— Health —————————————————————————————————————————————————————————————————————————————
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "atlasmarkets-viking", "version": "1.0.0"}
+    return {"status": "ok", "service": "atlasmarkets-stock", "version": "1.0.0"}
 
+
+# —— Preflight + History —————————————————————————————————————————————————————————————
 
 _decision_log: list[dict] = []
 
@@ -641,7 +658,7 @@ _decision_log: list[dict] = []
                 "properties": {
                     "input": {
                         "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL"}}
+                        "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. AAPL"}}
                     },
                     "output": {
                         "type": "object",
@@ -702,9 +719,9 @@ def preflight(symbol: str = "SPY"):
 
     warnings = []
     if regime == "bearish":
-        warnings.append("Bearish regime detected — consider defensive positioning")
-    if abs(pct) > 0.02:
-        warnings.append("Elevated volatility — verify entry timing")
+        warnings.append("Bearish regime detected — consider tighter stops")
+    if abs(pct) > 0.03:
+        warnings.append("High volatility — reduce position size")
     if len(recent) >= 3:
         warnings.append("3+ decisions in the last hour — cooldown recommended")
 
@@ -715,7 +732,7 @@ def preflight(symbol: str = "SPY"):
         "cooldown_active": len(recent) >= 5,
         "market_state": regime,
         "price": price,
-        "volatility": "HIGH" if abs(pct) > 0.015 else "NORMAL",
+        "volatility": "HIGH" if abs(pct) > 0.02 else "NORMAL",
         "warnings": warnings,
         "data_freshness": "FRESH",
     }
@@ -733,8 +750,8 @@ def preflight(symbol: str = "SPY"):
                     "input": {
                         "type": "object",
                         "properties": {
-                            "symbol": {"type": "string", "description": "Stock ticker e.g. SPY, QQQ, AAPL"},
-                            "limit": {"type": "integer", "description": "Max history entries"}
+                            "symbol": {"type": "string", "description": "Stock ticker e.g. AAPL"},
+                            "limit": {"type": "integer", "description": "Max entries"}
                         }
                     },
                     "output": {

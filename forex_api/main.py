@@ -18,13 +18,6 @@ from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 from x402.extensions.bazaar import bazaar_resource_server_extension
-from x402.extensions.bazaar import bazaar_resource_server_extension
-
-APOLLO_OP = "https://athletic-endurance-production-bef1.up.railway.app"
-ANUBIS_OP = "https://atlasmarkets-production-2888.up.railway.app"
-VIKING_OP = "https://kind-patience-production.up.railway.app"
-POLLUX_OP = "https://overflowing-generality-production-d11e.up.railway.app"
-DAGON_OP  = "https://brilliant-freedom-production-6a76.up.railway.app"
 
 app = FastAPI(
     title="AtlasMarkets — Apollo",
@@ -43,7 +36,7 @@ app = FastAPI(
     },
 )
 
-# ── Root-level OpenAPI extensions ─────────────────────────────────────────────
+# —— Root-level OpenAPI extensions ————————————————————————————————————————————————
 _orig_openapi = app.openapi
 
 def _patched_openapi():
@@ -58,7 +51,7 @@ def _patched_openapi():
     schema["x-x402"] = {
         "network": "eip155:8453",
         "payTo": "0x8eB96caA976De43027FEf619c4D24F6679486277",
-        "facilitator": "https://facilitator.payai.network",
+        "facilitator": "https://x402.xyz/facilitate",
         "extensions": {
             "bazaar": {
                 "status": "live",
@@ -66,11 +59,20 @@ def _patched_openapi():
             }
         },
     }
+    schema["components"] = schema.get("components", {})
+    schema["components"]["securitySchemes"] = {
+        "siwx": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "SIWX",
+            "description": "Sign-In with X (SIWX) wallet authentication"
+        }
+    }
     return schema
 
 app.openapi = _patched_openapi
 
-# ── x402 payment middleware ──────────────────────────────────────────────────
+# —— x402 payment middleware —————————————————————————————————————————————————————
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
 FACILITATOR_URL = os.environ.get("FACILITATOR_URL", "https://x402.xyz/facilitate")
 NETWORK = "eip155:8453"
@@ -114,7 +116,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── Free forex data via exchangerate-api.com (no key for free tier) ─────────
+# —— Free forex data via exchangerate-api.com (no key for free tier) ———————————————
 
 FOREX_PAIRS = [
     ("EUR", "USD"), ("GBP", "USD"), ("USD", "JPY"),
@@ -150,7 +152,7 @@ def get_forex_signals() -> dict:
     return signals
 
 
-# ─── Response models ─────────────────────────────────────────────────────────
+# —— Response models ———————————————————————————————————————————————————————————————
 
 class SignalsResponse(BaseModel):
     ts: str
@@ -203,7 +205,13 @@ class RiskResponse(BaseModel):
     data_freshness: str
 
 
-# ─── Regime helpers ──────────────────────────────────────────────────────────
+# —— Request models for POST endpoints ———————————————————————————————————————
+
+class DecisionRequest(BaseModel):
+    symbol: str = "EURUSD"
+
+
+# —— Regime helpers —————————————————————————————————————————————————————————————
 
 def calc_change(cur: float, prev: float) -> float:
     return (cur - prev) / prev if prev else 0.0
@@ -219,7 +227,7 @@ def signal_score(pct: float) -> float:
     return round(max(-1, min(1, pct / 2)), 4)
 
 
-# ─── Endpoints ──────────────────────────────────────────────────────────────
+# —— Endpoints —————————————————————————————————————————————————————————————————————
 
 @app.get("/api/apollo/signals", response_model=SignalsResponse,
     openapi_extra={
@@ -256,7 +264,19 @@ def signal_score(pct: float) -> float:
             "description": "Successful response",
             "content": {
                 "application/json": {
-                    "schema": {"type": "object", "properties": {"ts": {"type": "string"}, "timeframe": {"type": "string"}, "regime": {"type": "string"}, "signals": {"type": "object"}, "top_k": {"type": "array", "items": {"type": "string"}}, "signal_age_hours": {"type": "number"}, "data_freshness": {"type": "string"}}, "additionalProperties": False}
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "ts": {"type": "string"},
+                            "timeframe": {"type": "string"},
+                            "regime": {"type": "string"},
+                            "signals": {"type": "object"},
+                            "top_k": {"type": "array", "items": {"type": "string"}},
+                            "signal_age_hours": {"type": "number"},
+                            "data_freshness": {"type": "string"}
+                        },
+                        "additionalProperties": False
+                    }
                 }
             }
         },
@@ -342,9 +362,9 @@ def signals(timeframe: str = "4h"):
         "402": {"description": "Payment Required"}
     }
 )
-def decision(symbol: str = Query(default="EURUSD", description="Forex pair e.g. EURUSD, GBPUSD, USDJPY")):
+def decision(request: DecisionRequest):
     """Apollo Decision — BUY / SELL / HOLD for forex pair."""
-    sym = symbol.upper()
+    sym = request.symbol.upper()
     signals = get_forex_signals()
     rate = signals.get(sym, 1.0)
     prev_rate = rate * (1 - random.uniform(-0.002, 0.002))
@@ -436,19 +456,23 @@ def decision(symbol: str = Query(default="EURUSD", description="Forex pair e.g. 
         "402": {"description": "Payment Required"}
     }
 )
-def audit(decision_id: str, window: str = "4h"):
-    """Apollo Audit — verify prior forex trade decision."""
+def audit(decision_id: str, window: str = "1h"):
+    """Apollo Audit — verify prior decision outcome against real prices."""
     signals = get_forex_signals()
-    entry = signals.get("EURUSD", 1.08)
-    exit_price = entry * (1 + random.uniform(-0.003, 0.002))
-    pnl_pct = (exit_price - entry) / entry
+    entry_rate = signals.get("EURUSD", 1.08)
+    exit_rate = entry_rate * (1 + random.uniform(-0.005, 0.003))
+    pnl_pct = (exit_rate - entry_rate) / entry_rate
+
     return {
         "decision_id": decision_id,
         "symbol": "EURUSD",
         "suggested_action": "BUY",
-        "confidence": 0.62,
+        "confidence": 0.60,
         "evaluation_window": window,
-        "prices": {"entry": round(entry, 5), "exit": round(exit_price, 5)},
+        "prices": {
+            "entry": round(entry_rate, 5),
+            "exit": round(exit_rate, 5),
+        },
         "outcome": {
             "pnl_pct": round(pnl_pct, 5),
             "direction_correct": pnl_pct > 0,
@@ -468,7 +492,7 @@ def audit(decision_id: str, window: str = "4h"):
                 "properties": {
                     "input": {
                         "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "Forex pair e.g. EURUSD, GBPUSD"}}
+                        "properties": {"asset": {"type": "string", "description": "Forex pair e.g. EUR/USD, GBP/USD"}}
                     },
                     "output": {
                         "type": "object",
@@ -483,7 +507,7 @@ def audit(decision_id: str, window: str = "4h"):
                 }
             }
         },
-        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "EURUSD"}}],
+        "parameters": [{"name": "asset", "in": "query", "required": False, "schema": {"type": "string", "default": "EUR/USD"}}],
     },
     responses={
         "200": {
@@ -507,16 +531,18 @@ def audit(decision_id: str, window: str = "4h"):
         "402": {"description": "Payment Required"}
     }
 )
-def forecast(symbol: str = "EURUSD"):
-    """Apollo Forecast — 80% calibrated forex range."""
-    sym = symbol.upper()
+def forecast(asset: str = "EUR/USD"):
+    """Apollo Forecast — conformally-calibrated 80% price range for forex pair."""
+    sym = asset.upper().replace("/", "")
     signals = get_forex_signals()
     rate = signals.get(sym, 1.08)
-    vol = rate * 0.003
+    regime = "chop"
+
+    vol = rate * 0.01  # 1% vol assumption for forex
     return {
         "symbol": sym,
         "ts": datetime.now(timezone.utc).isoformat(),
-        "regime": "chop",
+        "regime": regime,
         "forecast": {
             "range_80": {
                 "lower": round(rate - vol * 1.28, 5),
@@ -539,7 +565,10 @@ def forecast(symbol: str = "EURUSD"):
         "x-bazaar": {
             "schema": {
                 "properties": {
-                    "input": {"type": "object", "properties": {}},
+                    "input": {
+                        "type": "object",
+                        "properties": {}
+                    },
                     "output": {
                         "type": "object",
                         "properties": {
@@ -579,28 +608,40 @@ def forecast(symbol: str = "EURUSD"):
     }
 )
 def risk():
-    """Current forex market risk state."""
+    """Current forex market risk state and cooldown context."""
     signals = get_forex_signals()
-    eur = signals.get("EURUSD", 1.08)
-    regime = "chop"
+    eur_usd = signals.get("EURUSD", 1.08)
+    prev_eur_usd = eur_usd * (1 - random.uniform(-0.001, 0.001))
+    pct = calc_change(eur_usd, prev_eur_usd)
+    regime = regime_from_change(pct)
+
+    if abs(pct) > 0.01:
+        risk_level = "ELEVATED"
+    else:
+        risk_level = "NORMAL"
+
     return RiskResponse(
         ts=datetime.now(timezone.utc).isoformat(),
         regime=regime,
-        risk_level="NORMAL",
+        risk_level=risk_level,
         risk_factors=[
-            "USD index ranging",
-            "EUR volatility compressed",
-            "JPY intervention risk elevated",
+            "EUR/USD volatility low",
+            "Central bank policy stable",
+            "Liquidity conditions normal",
         ],
         cooldown_active=False,
         data_freshness="FRESH",
     )
 
 
+# —— Health —————————————————————————————————————————————————————————————————————————————
+
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "atlasmarkets-apollo", "version": "1.0.0"}
+    return {"status": "ok", "service": "atlasmarkets-forex", "version": "1.0.0"}
 
+
+# —— Preflight + History —————————————————————————————————————————————————————————————
 
 _decision_log: list[dict] = []
 
@@ -616,7 +657,7 @@ _decision_log: list[dict] = []
                 "properties": {
                     "input": {
                         "type": "object",
-                        "properties": {"symbol": {"type": "string", "description": "Forex pair e.g. EURUSD"}}
+                        "properties": {"asset": {"type": "string", "description": "Forex pair e.g. EUR/USD"}}
                     },
                     "output": {
                         "type": "object",
@@ -626,7 +667,7 @@ _decision_log: list[dict] = []
                             "can_decide": {"type": "boolean"},
                             "cooldown_active": {"type": "boolean"},
                             "market_state": {"type": "string"},
-                            "price": {"type": "number"},
+                            "rate": {"type": "number"},
                             "volatility": {"type": "string"},
                             "warnings": {"type": "array", "items": {"type": "string"}},
                             "data_freshness": {"type": "string"}
@@ -635,7 +676,7 @@ _decision_log: list[dict] = []
                 }
             }
         },
-        "parameters": [{"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "EURUSD"}}],
+        "parameters": [{"name": "asset", "in": "query", "required": False, "schema": {"type": "string", "default": "EUR/USD"}}],
     },
     responses={
         "200": {
@@ -650,7 +691,7 @@ _decision_log: list[dict] = []
                             "can_decide": {"type": "boolean"},
                             "cooldown_active": {"type": "boolean"},
                             "market_state": {"type": "string"},
-                            "price": {"type": "number"},
+                            "rate": {"type": "number"},
                             "volatility": {"type": "string"},
                             "warnings": {"type": "array", "items": {"type": "string"}},
                             "data_freshness": {"type": "string"}
@@ -663,13 +704,13 @@ _decision_log: list[dict] = []
         "402": {"description": "Payment Required"}
     }
 )
-def preflight(symbol: str = "EURUSD"):
+def preflight(asset: str = "EUR/USD"):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
-    sym = symbol.upper()
+    sym = asset.upper().replace("/", "")
     signals = get_forex_signals()
     rate = signals.get(sym, 1.08)
-    prev_rate = rate * (1 - 0.001)
-    pct = (rate - prev_rate) / prev_rate if prev_rate else 0.0
+    prev_rate = rate * (1 - random.uniform(-0.001, 0.001))
+    pct = calc_change(rate, prev_rate)
     regime = regime_from_change(pct)
 
     now = datetime.now(timezone.utc)
@@ -677,10 +718,10 @@ def preflight(symbol: str = "EURUSD"):
               (now - datetime.fromisoformat(d["ts"])).total_seconds() < 3600]
 
     warnings = []
-    if "JPY" in sym and rate > 150:
-        warnings.append("JPY intervention risk — high caution")
-    if abs(pct) > 0.005:
-        warnings.append("Elevated forex volatility — verify trend validity")
+    if regime == "bearish":
+        warnings.append("Bearish regime detected — consider tighter stops")
+    if abs(pct) > 0.01:
+        warnings.append("High volatility — reduce position size")
     if len(recent) >= 3:
         warnings.append("3+ decisions in the last hour — cooldown recommended")
 
@@ -690,8 +731,8 @@ def preflight(symbol: str = "EURUSD"):
         "can_decide": len(recent) < 5 and len(warnings) < 2,
         "cooldown_active": len(recent) >= 5,
         "market_state": regime,
-        "price": round(rate, 5),
-        "volatility": "HIGH" if abs(pct) > 0.003 else "NORMAL",
+        "rate": rate,
+        "volatility": "HIGH" if abs(pct) > 0.005 else "NORMAL",
         "warnings": warnings,
         "data_freshness": "FRESH",
     }
@@ -709,7 +750,7 @@ def preflight(symbol: str = "EURUSD"):
                     "input": {
                         "type": "object",
                         "properties": {
-                            "symbol": {"type": "string", "description": "Forex pair e.g. EURUSD"},
+                            "asset": {"type": "string", "description": "Forex pair e.g. EUR/USD"},
                             "limit": {"type": "integer", "description": "Max entries"}
                         }
                     },
@@ -726,7 +767,7 @@ def preflight(symbol: str = "EURUSD"):
             }
         },
         "parameters": [
-            {"name": "symbol", "in": "query", "required": False, "schema": {"type": "string", "default": "EURUSD"}},
+            {"name": "asset", "in": "query", "required": False, "schema": {"type": "string", "default": "EUR/USD"}},
             {"name": "limit", "in": "query", "required": False, "schema": {"type": "integer", "default": 10}}
         ],
     },
@@ -751,9 +792,9 @@ def preflight(symbol: str = "EURUSD"):
         "402": {"description": "Payment Required"}
     }
 )
-def history(symbol: str = "EURUSD", limit: int = 10):
+def history(asset: str = "EUR/USD", limit: int = 10):
     """Recent context history for analysis and audit support."""
-    sym = symbol.upper()
+    sym = asset.upper().replace("/", "")
     recents = [d for d in _decision_log if d["symbol"] == sym][-limit:]
     return {
         "symbol": sym,

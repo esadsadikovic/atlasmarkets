@@ -38,7 +38,7 @@ app = FastAPI(
     },
 )
 
-# ── Root-level OpenAPI extensions ─────────────────────────────────────────────
+# —— Root-level OpenAPI extensions ————————————————————————————————————————————————
 _orig_openapi = app.openapi
 
 def _patched_openapi():
@@ -61,11 +61,20 @@ def _patched_openapi():
             }
         },
     }
+    schema["components"] = schema.get("components", {})
+    schema["components"]["securitySchemes"] = {
+        "siwx": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "SIWX",
+            "description": "Sign-In with X (SIWX) wallet authentication"
+        }
+    }
     return schema
 
 app.openapi = _patched_openapi
 
-# ── x402 payment middleware ──────────────────────────────────────────────────
+# —— x402 payment middleware —————————————————————————————————————————————————————
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
 FACILITATOR_URL = os.environ.get("FACILITATOR_URL", "https://x402.xyz/facilitate")
 NETWORK = "eip155:8453"
@@ -97,7 +106,7 @@ _ROUTES = {
     }.items()
 }
 
-# ── 405 guard: intercept wrong HTTP methods and return 402 so x402scan can probe ──
+# —— 405 guard: intercept wrong HTTP methods and return 402 so x402scan can probe ———————
 _METHOD_ACCEPTS = {
     "/api/anubis/signals":  ["GET"],
     "/api/anubis/decision": ["POST"],
@@ -129,8 +138,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── CoinGecko free API helper ───────────────────────────────────────────────
-
+# —— CoinGecko free API helper —————————————————————————————————————————————————
 COINGECKO_URL = "https://api.coingecko.com/api/v3"
 
 def get_crypto_price(symbol: str) -> Optional[dict]:
@@ -160,7 +168,7 @@ def get_crypto_price(symbol: str) -> Optional[dict]:
         pass
     return None
 
-# ─── Response models ─────────────────────────────────────────────────────────
+# —— Response models ———————————————————————————————————————————————————————————————
 
 class SignalsResponse(BaseModel):
     ts: str
@@ -213,7 +221,13 @@ class RiskResponse(BaseModel):
     data_freshness: str
 
 
-# ─── Regime helpers ──────────────────────────────────────────────────────────
+# —— Request models for POST endpoints ———————————————————————————————————————
+
+class DecisionRequest(BaseModel):
+    symbol: str = "BTC"
+
+
+# —— Regime helpers —————————————————————————————————————————————————————————————
 
 def regime_from_change(pct_24h: float) -> str:
     if pct_24h > 5:   return "bullish"
@@ -225,7 +239,7 @@ def signal_score(pct_24h: float) -> float:
     return round(max(-1, min(1, pct_24h / 10)), 4)
 
 
-# ─── Endpoints ───────────────────────────────────────────────────────────────
+# —— Endpoints —————————————————————————————————————————————————————————————————————
 
 @app.get("/api/anubis/signals", response_model=SignalsResponse,
     openapi_extra={
@@ -356,9 +370,9 @@ def signals(timeframe: str = "15m"):
         "402": {"description": "Payment Required"}
     }
 )
-def decision(symbol: str = Query(default="BTC", description="Crypto symbol e.g. BTC, ETH")):
+def decision(request: DecisionRequest):
     """Anubis Decision — probabilistic journal entry with decision_id."""
-    sym = symbol.upper()
+    sym = request.symbol.upper()
     data = get_crypto_price(sym.lower())
     price = data["price"] if data else 50000.0
     pct = (data["change_24h"] if data else 0) / 100
@@ -634,14 +648,14 @@ def risk():
     )
 
 
-# ─── Health ──────────────────────────────────────────────────────────────────
+# —— Health —————————————————————————————————————————————————————————————————————————————
 
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "atlasmarkets-crypto", "version": "1.0.0"}
 
 
-# ─── Preflight + History ─────────────────────────────────────────────────────
+# —— Preflight + History —————————————————————————————————————————————————————————————
 
 _decision_log: list[dict] = []
 
