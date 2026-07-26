@@ -22,6 +22,11 @@ from x402.mechanisms.evm.exact import ExactEvmServerScheme
 from x402.extensions.bazaar import bazaar_resource_server_extension
 from x402.schemas.responses import SupportedKind, SupportedResponse
 
+# Suppress FastAPI's default /openapi.json route so our custom get_openapi()
+# handler at /openapi.json takes precedence. Must set on class before FastAPI()
+# instantiates the app, otherwise FastAPI registers its default Route first.
+FastAPI.openapi_url = None
+
 app = FastAPI(
     title="AtlasMarkets — Viking",
     version="1.0.0",

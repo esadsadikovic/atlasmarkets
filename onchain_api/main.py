@@ -22,6 +22,8 @@ from x402.mechanisms.evm.exact import ExactEvmServerScheme
 from x402.extensions.bazaar import bazaar_resource_server_extension
 from x402.schemas.responses import SupportedKind, SupportedResponse
 
+FastAPI.openapi_url = None
+
 app = FastAPI(
     title="AtlasMarkets — Dagon",
     version="1.0.0",
