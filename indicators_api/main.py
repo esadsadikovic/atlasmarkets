@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse
 import requests
 
 from x402.http.middleware.fastapi import payment_middleware
+from x402.schemas.responses import SupportedKind, SupportedResponse
 from x402 import server
 from x402.http import HTTPFacilitatorClient
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
@@ -41,6 +42,19 @@ _facilitator = HTTPFacilitatorClient({"url": FACILITATOR_URL})
 _x402_server = server.x402ResourceServer(_facilitator)
 _x402_server.register(NETWORK, ExactEvmServerScheme())
 _x402_server.register_extension(bazaar_resource_server_extension)
+
+# Pre-populate facilitator support for Base mainnet to avoid Cloudflare-blocked
+# initializer call at startup. The exact scheme for eip155:8453 is well-known.
+_x402_server._supported_responses = {
+    "eip155:8453": SupportedResponse(
+        kinds=[
+            SupportedKind(x402_version=2, scheme="exact", network="eip155:8453", extra={}),
+        ],
+        extensions=["bazaar"],
+        signers={},
+    )
+}
+_x402_server._initialized = True
 
 _ROUTES = {}
 
