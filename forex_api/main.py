@@ -335,6 +335,7 @@ def forecast(asset: str = Query(default="EUR/USD", description="Forex pair e.g. 
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Current forex market risk state and regime. No parameters required.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}},
             },
 )
 def risk():

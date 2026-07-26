@@ -336,6 +336,7 @@ def forecast(symbol: str = Query(default="Gold (XAU/USD)", description="Commodit
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Current commodities market risk state and regime. No parameters required.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}},
             },
 )
 def risk():

@@ -377,6 +377,7 @@ def forecast(symbol: str = Query(default="ETH", description="ETH or BTC")):
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Current on-chain risk state: ETH gas, BTC fees, DeFi TVL. No parameters required.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}},
             },
 )
 def risk():

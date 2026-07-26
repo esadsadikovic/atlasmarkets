@@ -336,6 +336,7 @@ def forecast(symbol: str = Query(default="SPY", description="Stock ticker e.g. A
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Current market risk state, regime, and cooldown context.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}},
             },
 )
 def risk():

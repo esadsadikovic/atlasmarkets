@@ -366,7 +366,7 @@ def forecast(symbol: str = Query(default="BTC", description="Symbol e.g. BTC, ET
             "protocols": [{"x402": {}}],
         },
         "x-guidance": "Returns current market risk state, regime, and cooldown context. No parameters required.",
-
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}},
     },
 )
 def risk():
