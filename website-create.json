@@ -1,0 +1,14 @@
+{
+  "type": "web_service",
+  "name": "atlasmarkets-website",
+  "ownerId": "tea-d9hbhjt8nd3s73cmvkmg",
+  "image": {"uri": "docker.io/mecomax/atlasmarkets-website:latest"},
+  "plan": "free",
+  "region": "oregon",
+  "serviceDetails": {
+    "env": "docker",
+    "port": 8080,
+    "healthCheckPath": "/",
+    "pullRequestPreviewsEnabled": false
+  }
+}
