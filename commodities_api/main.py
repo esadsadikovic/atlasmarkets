@@ -58,12 +58,19 @@ _ROUTES = {
         },
         "extensions": {
             "bazaar": {
-                "info": {"input": {"method": "GET", "pathParams": {}}},
+                "info": {"input": {"type": "http", "method": "GET", "queryParams": {}}},
                 "schema": {
                     "properties": {
                         "input": {
-                            "properties": {"method": {"type": "string"}, "pathParams": {"type": "object"}},
-                            "required": ["method"]
+                            "type": "object",
+                            "properties": {
+                                "type": {"const": "http"},
+                                "method": {"enum": ["GET"]},
+                                "queryParams": {"type": "object", "properties": {}, "additionalProperties": False},
+                                "pathParams": {"type": "object", "properties": {}}
+                            },
+                            "required": ["type", "method"],
+                            "additionalProperties": False
                         }
                     },
                     "required": ["input"]
