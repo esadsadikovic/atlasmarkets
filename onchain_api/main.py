@@ -56,6 +56,20 @@ _ROUTES = {
             "price": price,
             "network": NETWORK,
         },
+        "extensions": {
+            "bazaar": {
+                "info": {"input": {"method": "GET", "pathParams": {}}},
+                "schema": {
+                    "properties": {
+                        "input": {
+                            "properties": {"method": {"type": "string"}, "pathParams": {"type": "object"}},
+                            "required": ["method"]
+                        }
+                    },
+                    "required": ["input"]
+                }
+            }
+        },
         "description": f"Dagon {ep} — AtlasMarkets market intelligence",
         "mimeType": "application/json",
     }
