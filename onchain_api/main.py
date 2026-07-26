@@ -30,12 +30,13 @@ app = FastAPI(
     description="on-chain data intelligence for AI agents. x402-protected on Base mainnet.",
 )
 
-@app.get("/openapi.json", include_in_schema=False)
-def get_openapi():
-    spec = app.openapi()
+_original_openapi = app.openapi
+def _patched_openapi():
+    spec = _original_openapi()
     spec["info"]["x-guidance"] = "AtlasMarkets Dagon provides on-chain data intelligence for AI agents. Routes vary by endpoint — see each operation for pricing. x402 payment required for all protected routes."
     spec["info"]["contact"] = {"email": "max.sadikovic@gmail.com"}
     return spec
+app.openapi = _patched_openapi
 
 # —— x402 payment middleware —————————————————————————————————————————————————————
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"

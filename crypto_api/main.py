@@ -30,13 +30,15 @@ app = FastAPI(
     description="Crypto market intelligence for AI agents. x402-protected on Base mainnet.",
 )
 
-# Inject info.x-guidance and info.contact into the auto-generated OpenAPI spec
-@app.get("/openapi.json", include_in_schema=False)
-def get_openapi():
-    spec = app.openapi()
+# Patch app.openapi() so FastAPI's internal /openapi.json handling returns our
+# patched spec with x-guidance and contact.
+_original_openapi = app.openapi
+def _patched_openapi():
+    spec = _original_openapi()
     spec["info"]["x-guidance"] = "AtlasMarkets Anubis provides crypto market intelligence for AI agents. Routes: GET /api/anubis/signals ($0.05), GET /api/anubis/forecast?symbol=BTC ($0.05), GET /api/anubis/risk ($0.02), GET /api/anubis/preflight?symbol=BTC ($0.05), GET /api/anubis/history?symbol=BTC ($0.05), GET /api/anubis/audit?decision_id=X ($0.07), POST /api/anubis/decision ($0.15). All routes return real-time crypto data."
     spec["info"]["contact"] = {"email": "max.sadikovic@gmail.com"}
     return spec
+app.openapi = _patched_openapi
 
 # —— x402 payment middleware —————————————————————————————————————————————————————
 PAY_TO = "0x8eB96caA976De43027FEf619c4D24F6679486277"
