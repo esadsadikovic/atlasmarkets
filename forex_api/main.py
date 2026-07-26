@@ -216,8 +216,7 @@ def signal_score(pct: float) -> float:
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Returns ranked forex pair signals. Pass ?timeframe=4h for 4-hour signals.",
-        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
-    },
+            },
 )
 def signals(timeframe: str = Query(default="4h", description="Time window e.g. 15m, 1h, 1d, 4h")):
     """Apollo Signals — forex pair rates and momentum signals."""
@@ -274,8 +273,7 @@ def decision(request: DecisionRequest):
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Verify a prior decision outcome. Pass ?decision_id=X.",
-        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
-    },
+            },
 )
 def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
     """Apollo Audit — verify prior decision outcome against real prices."""
@@ -306,8 +304,7 @@ def audit(decision_id: str = Query(..., description="Decision ID to audit"), win
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Get conformally-calibrated 80% price range. Pass ?asset=EUR/USD.",
-        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
-    },
+            },
 )
 def forecast(asset: str = Query(default="EUR/USD", description="Forex pair e.g. EUR/USD, GBP/USD")):
     """Apollo Forecast — conformally-calibrated 80% price range for forex pair."""
@@ -338,8 +335,7 @@ def forecast(asset: str = Query(default="EUR/USD", description="Forex pair e.g. 
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.020000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Current forex market risk state and regime. No parameters required.",
-        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
-    },
+            },
 )
 def risk():
     """Current forex market risk state and cooldown context."""
@@ -385,8 +381,7 @@ _decision_log: list[dict] = []
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Check pre-decision conditions: cooldowns, market state, freshness. Pass ?asset=EUR/USD.",
-        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
-    },
+            },
 )
 def preflight(asset: str = Query(default="EUR/USD", description="Forex pair e.g. EUR/USD")):
     """Pre-decision conditions check — cooldowns, market state, freshness, warnings."""
@@ -426,8 +421,7 @@ def preflight(asset: str = Query(default="EUR/USD", description="Forex pair e.g.
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Get recent context history. Pass ?asset=EUR/USD&limit=10.",
-        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {}}}}, "required": False},
-    },
+            },
 )
 def history(asset: str = Query(default="EUR/USD", description="Forex pair e.g. EUR/USD"), limit: int = Query(default=10, description="Max entries")):
     """Recent context history for analysis and audit support."""
