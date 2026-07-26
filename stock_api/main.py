@@ -398,6 +398,12 @@ def health():
     return {"status": "ok", "service": "atlasmarkets-stock", "version": "1.0.0"}
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    from starlette.responses import RedirectResponse
+    return RedirectResponse(url="/static/favicon.ico", status_code=302)
+
+
 # —— Preflight + History —————————————————————————————————————————————————————————————
 
 _decision_log: list[dict] = []
