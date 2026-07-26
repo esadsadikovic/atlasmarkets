@@ -243,6 +243,7 @@ def signal_score(gwei: float) -> float:
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Returns on-chain signals: ETH gas, BTC fees, DeFi TVL, whale alerts. Pass ?timeframe=15m.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d", "default": "15m"}}, "required": []}}}},
             },
 )
 def signals(timeframe: str = Query(default="15m", description="Time window e.g. 15m, 1h, 1d")):
@@ -315,6 +316,7 @@ def decision(request: DecisionRequest):
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Verify a prior decision outcome against real on-chain conditions. Pass ?decision_id=X.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"decision_id": {"type": "string", "description": "Decision ID to audit"}, "window": {"type": "string", "description": "Evaluation window e.g. 1h", "default": "1h"}}, "required": []}}}},
             },
 )
 def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
@@ -346,6 +348,7 @@ def audit(decision_id: str = Query(..., description="Decision ID to audit"), win
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Get conformally-calibrated 80% gas fee range. Pass ?symbol=ETH.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"symbol": {"type": "string", "description": "ETH or BTC", "default": "ETH"}}, "required": []}}}},
             },
 )
 def forecast(symbol: str = Query(default="ETH", description="ETH or BTC")):
@@ -423,6 +426,7 @@ _decision_log: list[dict] = []
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Check pre-decision conditions: cooldowns, market state, freshness. Pass ?symbol=ETH.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"symbol": {"type": "string", "description": "ETH or BTC", "default": "ETH"}}, "required": []}}}},
             },
 )
 def preflight(symbol: str = Query(default="ETH", description="ETH or BTC")):
@@ -461,6 +465,7 @@ def preflight(symbol: str = Query(default="ETH", description="ETH or BTC")):
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Get recent context history. Pass ?symbol=ETH&limit=10.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"symbol": {"type": "string", "description": "ETH or BTC", "default": "ETH"}, "limit": {"type": "integer", "description": "Max entries", "default": 10}}, "required": []}}}},
             },
 )
 def history(symbol: str = Query(default="ETH", description="ETH or BTC"), limit: int = Query(default=10, description="Max entries")):

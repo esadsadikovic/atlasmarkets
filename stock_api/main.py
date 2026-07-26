@@ -202,6 +202,7 @@ def signal_score(pct: float) -> float:
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Returns ranked stock signals for S&P 500 tickers. Pass ?timeframe=1d for daily signals.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 1h, 1d, 1w", "default": "1d"}}, "required": []}}}},
             },
 )
 def signals(timeframe: str = Query(default="1d", description="Time window e.g. 1h, 1d, 1w")):
@@ -272,6 +273,7 @@ def decision(request: DecisionRequest):
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.070000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Verify a prior decision outcome. Pass ?decision_id=X.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"decision_id": {"type": "string", "description": "Decision ID to audit"}, "window": {"type": "string", "description": "Evaluation window e.g. 1h", "default": "1h"}}, "required": []}}}},
             },
 )
 def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
@@ -305,6 +307,7 @@ def audit(decision_id: str = Query(..., description="Decision ID to audit"), win
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Get conformally-calibrated 80% price range for a stock. Pass ?symbol=SPY.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. AAPL, SPY", "default": "SPY"}}, "required": []}}}},
             },
 )
 def forecast(symbol: str = Query(default="SPY", description="Stock ticker e.g. AAPL, SPY")):
@@ -383,6 +386,7 @@ _decision_log: list[dict] = []
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Check pre-decision conditions: cooldowns, market state, freshness. Pass ?symbol=SPY.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. AAPL", "default": "SPY"}}, "required": []}}}},
             },
 )
 def preflight(symbol: str = Query(default="SPY", description="Stock ticker e.g. AAPL")):
@@ -422,6 +426,7 @@ def preflight(symbol: str = Query(default="SPY", description="Stock ticker e.g. 
     openapi_extra={
         "x-payment-info": {"price": {"mode": "fixed", "currency": "USD", "amount": "0.050000"}, "protocols": [{"x402": {}}]},
         "x-guidance": "Get recent context history. Pass ?symbol=SPY&limit=10.",
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Stock ticker e.g. AAPL", "default": "SPY"}, "limit": {"type": "integer", "description": "Max entries", "default": 10}}, "required": []}}}},
             },
 )
 def history(symbol: str = Query(default="SPY", description="Stock ticker e.g. AAPL"), limit: int = Query(default=10, description="Max entries")):

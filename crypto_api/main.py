@@ -213,7 +213,7 @@ def signal_score(pct_24h: float) -> float:
             "protocols": [{"x402": {}}],
         },
         "x-guidance": "Returns current crypto market regime and top signals. Pass ?timeframe=15m for short-term signals.",
-
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"timeframe": {"type": "string", "description": "Time window e.g. 15m, 1h, 1d", "default": "15m"}}, "required": []}}}},
     },
 )
 def signals(timeframe: str = Query(default="15m", description="Time window e.g. 15m, 1h, 1d")):
@@ -293,7 +293,7 @@ def decision(request: DecisionRequest):
             "protocols": [{"x402": {}}],
         },
         "x-guidance": "Audit a prior decision outcome. Pass ?decision_id=X to verify against real prices.",
-
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"decision_id": {"type": "string", "description": "Decision ID to audit"}, "window": {"type": "string", "description": "Evaluation window e.g. 1h", "default": "1h"}}, "required": []}}}},
     },
 )
 def audit(decision_id: str = Query(..., description="Decision ID to audit"), window: str = Query(default="1h", description="Evaluation window e.g. 1h")):
@@ -330,7 +330,7 @@ def audit(decision_id: str = Query(..., description="Decision ID to audit"), win
             "protocols": [{"x402": {}}],
         },
         "x-guidance": "Get conformally-calibrated 80% price range. Pass ?symbol=BTC to specify asset.",
-
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Symbol e.g. BTC, ETH", "default": "BTC"}}, "required": []}}}},
     },
 )
 def forecast(symbol: str = Query(default="BTC", description="Symbol e.g. BTC, ETH")):
@@ -417,7 +417,7 @@ _decision_log: list[dict] = []
             "protocols": [{"x402": {}}],
         },
         "x-guidance": "Check pre-decision conditions: cooldowns, market state, freshness, warnings. Pass ?symbol=BTC to check a specific asset.",
-
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Symbol e.g. BTC", "default": "BTC"}}, "required": []}}}},
     },
 )
 def preflight(symbol: str = Query(default="BTC", description="Symbol e.g. BTC")):
@@ -460,7 +460,7 @@ def preflight(symbol: str = Query(default="BTC", description="Symbol e.g. BTC"))
             "protocols": [{"x402": {}}],
         },
         "x-guidance": "Get recent context history for analysis. Pass ?symbol=BTC&limit=10 to filter results.",
-
+        "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"symbol": {"type": "string", "description": "Symbol e.g. BTC", "default": "BTC"}, "limit": {"type": "integer", "description": "Max entries", "default": 10}}, "required": []}}}},
     },
 )
 def history(symbol: str = Query(default="BTC", description="Symbol e.g. BTC"), limit: int = Query(default=10, description="Max entries")):
