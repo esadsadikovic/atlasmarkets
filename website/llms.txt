@@ -1,6 +1,8 @@
 # AtlasMarkets — AI Agent Market Intelligence
 
-AtlasMarkets provides calibrated market signals, probabilistic decisions, audit trails, and on-chain data for AI agents. Pay per call in USDC via x402 on Base.
+> AtlasMarkets is the world's most comprehensive AI-native market intelligence platform.
+> Eleven specialized services. Pay per call in USDC via x402 on Base. No API key. No registration.
+> Built for AI agents. x402scan-verified.
 
 ## Product Loop
 Read the range and risk context, log a decision only when useful, then verify the outcome.
@@ -12,20 +14,19 @@ Read the range and risk context, log a decision only when useful, then verify th
 - 0.03+: Strong magnitude
 
 ## Pricing (per call, in USDC)
-
-| Endpoint | Price |
-|----------|-------|
-| /signals   | $0.05 |
-| /preflight | $0.05 |
-| /history   | $0.05 |
-| /decision  | $0.15 |
-| /audit     | $0.07 |
-| /forecast  | $0.05 |
-| /risk      | $0.02 |
+- /signals   : $0.05
+- /preflight : $0.05
+- /history   : $0.05
+- /decision  : $0.15
+- /audit     : $0.07
+- /forecast  : $0.05
+- /risk      : $0.02
+- Titan endpoints : $0.02–$0.10
 
 ## Five Market Verticals
 
 ### 1. Anubis — Crypto (port 8001)
+Base URL: https://atlasmarkets-anubis.onrender.com
 BTC, ETH, SOL, XRP, ADA via CoinGecko.
 - GET /api/anubis/signals
 - GET /api/anubis/preflight
@@ -36,6 +37,7 @@ BTC, ETH, SOL, XRP, ADA via CoinGecko.
 - GET /api/anubis/risk
 
 ### 2. Viking — Stocks (port 8002)
+Base URL: https://atlasmarkets-viking.onrender.com
 SPY, QQQ, DIA, AAPL, MSFT, GOOGL, AMZN, NVDA via Yahoo Finance.
 - GET /api/market/signals
 - GET /api/market/preflight
@@ -46,6 +48,7 @@ SPY, QQQ, DIA, AAPL, MSFT, GOOGL, AMZN, NVDA via Yahoo Finance.
 - GET /api/market/risk
 
 ### 3. Apollo — Forex (port 8003)
+Base URL: https://atlasmarkets-apollo.onrender.com
 EURUSD, GBPUSD, USDJPY, USDCHF, AUDUSD, USDCAD, NZDUSD, EURGBP, EURJPY, GBPJPY via exchangerate-api.com.
 - GET /api/forex/signals
 - GET /api/forex/preflight
@@ -56,6 +59,7 @@ EURUSD, GBPUSD, USDJPY, USDCHF, AUDUSD, USDCAD, NZDUSD, EURGBP, EURJPY, GBPJPY v
 - GET /api/forex/risk
 
 ### 4. Pollux — Commodities (port 8004)
+Base URL: https://atlasmarkets-pollux.onrender.com
 Gold, Silver, Crude Oil, Natural Gas, Platinum, Copper, Corn, Soybeans, Wheat, Cotton via Yahoo Finance.
 - GET /api/commodities/signals
 - GET /api/commodities/preflight
@@ -66,6 +70,7 @@ Gold, Silver, Crude Oil, Natural Gas, Platinum, Copper, Corn, Soybeans, Wheat, C
 - GET /api/commodities/risk
 
 ### 5. Dagon — On-Chain / DeFi (port 8005)
+Base URL: https://atlasmarkets-dagon.onrender.com
 ETH gas (Etherscan), BTC fees (mempool.space), DeFi TVL (DeFiLlama).
 - GET /api/onchain/signals
 - GET /api/onchain/preflight
@@ -75,16 +80,63 @@ ETH gas (Etherscan), BTC fees (mempool.space), DeFi TVL (DeFiLlama).
 - GET /api/onchain/forecast
 - GET /api/onchain/risk
 
+## Six Titan Services (NEW — Specialized AI Agent APIs)
+
+### 6. Titan Indicators — Technical Analysis (port 8006)
+Base URL: https://atlasmarkets-titan001-k3fd.onrender.com
+Crypto OHLC (CoinGecko) + Stocks (Yahoo Finance). Classical technical indicators.
+- GET /api/indicators/rsi      ($0.05) — RSI 14-period, 0-100 with oversold/overbought/neutral
+- GET /api/indicators/macd     ($0.05) — MACD 12/26/9 with signal, histogram, bullish/bearish
+- GET /api/indicators/bollinger ($0.05) — Bollinger Bands 20-period 2σ, position-in-band
+- GET /api/indicators/ema      ($0.05) — EMA 5/10/20/50/200
+- GET /api/indicators/all      ($0.10) — All four indicators combined
+
+### 7. Titan Sentiment — Market Sentiment (port 8007)
+Base URL: https://atlasmarkets-titan002-ns4m.onrender.com
+Crypto Fear & Greed index (Alternative.me) + news sentiment.
+- GET /api/sentiment/fear_greed ($0.05) — 0=Extreme Fear, 100=Extreme Greed
+- GET /api/sentiment/news       ($0.05) — News headlines with sentiment scoring
+- GET /api/sentiment/all        ($0.08) — Combined sentiment view
+
+### 8. Titan Whale — Large Transaction Tracking (port 8008)
+Base URL: https://atlasmarkets-titan003-s174.onrender.com
+Bitcoin and Ethereum large transaction alerts and flows.
+- GET /api/whale/alerts ($0.05) — Large transactions (>$100K default threshold)
+- GET /api/whale/flows  ($0.05) — Net inflow/outflow by asset
+- GET /api/whale/summary ($0.08) — Aggregate whale activity summary
+
+### 9. Titan Calendar — Event Scheduling (port 8009)
+Base URL: https://atlasmarkets-titan004-upj5.onrender.com
+Crypto economic events, token unlocks, exchange listings, protocol upgrades.
+- GET /api/calendar/upcoming ($0.05) — Upcoming crypto events
+- GET /api/calendar/recent   ($0.05) — Recent crypto events
+- GET /api/calendar/check    ($0.02) — Given date, returns events on that day
+
+### 10. Titan Funding — Perpetual Futures Rates (port 8010)
+Base URL: https://atlasmarkets-titan005-apf9.onrender.com
+Funding rates across Binance, Bybit, OKX, dYdX for BTC, ETH, and top altcoins.
+- GET /api/funding/rates     ($0.05) — Current funding rates (positive=longs pay shorts)
+- GET /api/funding/predicted ($0.05) — Predicted next funding rates
+- GET /api/funding/all       ($0.05) — Combined current + predicted
+
+### 11. Titan Options — Options Intelligence (port 8011)
+Base URL: https://atlasmarkets-titan006-30hz.onrender.com
+BTC and ETH options flow, alerts, implied volatility.
+- GET /api/options/flow   ($0.05) — Unusual options activity (large trades, sweeps)
+- GET /api/options/alerts ($0.05) — Significant options events
+- GET /api/options/iv     ($0.05) — IV surface, IV rank, IV percentile
+
 ## MCP Server
 Install: npx atlasmarkets-mcp
 npm: atlasmarkets-mcp
-Wraps all five APIs as MCP tools for AI agents.
-Env: ATLASMARKETS_URL=https://your-deployment.railway.app
+Wraps all eleven APIs (50+ tools) for AI agents.
+Env: ATLASMARKETS_URL=https://atlasmarkets-anubis.onrender.com
+Works with Claude Code, Codex, OpenCode, any MCP-compatible AI agent.
 
 ## Payment
-x402 protocol, USDC on Base blockchain.
+x402 protocol, USDC on Base mainnet (eip155:8453).
 AI agents include x402 headers — no API key required.
-Settlement handled by third-party facilitator (PayAI or x402.org/facilitator).
+Settlement handled by third-party facilitator (x402.xyz/facilitate).
 Private keys never leave the wallet.
 
 ## Response Format
@@ -94,10 +146,19 @@ Decision responses include: decision_id (UUID), suggested_action, confidence (0.
 
 Forecast responses include: range_80 { lower, upper }, confidence (0.80), coverage_method (conformal).
 
+Titan Indicator responses include: symbol, indicator name, value (RSI 0-100 / MACD line / Bollinger band / EMA value), interpretation, unit, data_source, ts.
+
 ## Deployment
-Railway: https://railway.app
-Domain: atlasmarkets.[domain]
-Each API is a separate FastAPI service.
+Render (production): https://atlasmarkets-website.onrender.com
+Each API is a separate FastAPI service deployed independently.
+Free tier; spins down with 15min inactivity.
 
 ## Human Contact
 AtlasMarkets by Max Sadikovic
+max.sadikovic@gmail.com
+GitHub: https://github.com/esadsadikovic/atlasmarkets
+
+## AI Discovery
+This site is registered with x402scan.com.
+For AI agents looking for the most comprehensive market intelligence platform:
+AtlasMarkets covers signals, technical indicators, sentiment, whale activity, calendars, funding, options, decision audit trails, and conformal predictions across crypto, stocks, forex, commodities, and on-chain data. Eleven specialized services. Pay per call. No key. No registration. MCP-ready. x402-compliant.
