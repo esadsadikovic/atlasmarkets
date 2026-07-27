@@ -50,6 +50,9 @@
       padding: 1rem 2rem;
       border-bottom: 1px solid var(--border);
       background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     nav .logo {
       font-weight: 800;
@@ -66,6 +69,12 @@
       text-decoration: none;
       margin-left: 0.25rem;
     }
+    nav .links a.nav-purple {
+      color: var(--purple);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    nav .links a.nav-purple:hover { color: var(--cyan); }
     nav .meta {
       flex: 1;
       color: var(--muted);
@@ -86,12 +95,25 @@
       max-width: 900px;
       margin: 0 auto;
     }
-    .hero h1 {
-      font-size: 3rem;
-      font-weight: 800;
-      color: var(--white);
-      margin-bottom: 1rem;
-      letter-spacing: -0.02em;
+    /* ── ATLASMARKETS FLOATING HERO TITLE ── */
+    @keyframes atlasmarkets-cycle {
+      0%   { color: #ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.5), 0 0 60px rgba(255,255,255,0.3); }
+      33%  { color: #00d4ff; text-shadow: 0 0 40px rgba(0,212,255,0.7), 0 0 80px rgba(0,212,255,0.4); }
+      66%  { color: #a78bfa; text-shadow: 0 0 40px rgba(167,139,250,0.7), 0 0 80px rgba(167,139,250,0.4); }
+      100% { color: #ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.5), 0 0 60px rgba(255,255,255,0.3); }
+    }
+    @keyframes atlasmarkets-float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+    .hero h1.atlasmarkets-title {
+      font-size: clamp(5rem, 13vw, 9rem);
+      font-weight: 900;
+      margin-bottom: 1.5rem;
+      line-height: 1.0;
+      letter-spacing: -0.04em;
+      animation: atlasmarkets-cycle 6s ease-in-out infinite, atlasmarkets-float 4s ease-in-out infinite;
+      will-change: transform, color, text-shadow;
     }
     .hero p {
       font-size: 1rem;
@@ -153,16 +175,15 @@
 
 <nav>
   <a href="/" class="logo">ATLAS<span>MARKETS</span></a>
-  <a href="/dieties" class="product-tag">Dieties →</a>
   <div class="meta">x402 · Base Mainnet</div>
   <div class="links">
-    <a href="/dieties">dieties</a>
-    <a href="/llms.txt">llms.txt</a>
+    <a href="/dieties" class="nav-purple">Dieties</a>
+    <a href="/llms.txt" class="nav-purple">llms.txt</a>
   </div>
 </nav>
 
 <section class="hero">
-  <h1>AtlasMarkets</h1>
+  <h1 class="atlasmarkets-title">AtlasMarkets</h1>
   <p>x402 AI services on Base. AtlasMarkets ships AI agent products that use x402 micropayments (USDC) and require no API key.</p>
 </section>
 
