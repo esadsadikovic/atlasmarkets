@@ -499,15 +499,26 @@
       max-width: 640px;
       margin: 0 auto;
     }
-    .hero h1 {
-      font-size: clamp(1.4rem, 3vw, 1.9rem);
-      font-weight: 800;
-      color: var(--white);
-      margin-bottom: 0.75rem;
-      line-height: 1.2;
+    /* ── DIETIES FLOATING HERO TITLE ── */
+    @keyframes dieties-cycle {
+      0%   { color: #ffffff; text-shadow: 0 0 20px rgba(255,255,255,0.4), 0 0 40px rgba(255,255,255,0.2); }
+      33%  { color: #00d4ff; text-shadow: 0 0 30px rgba(0,212,255,0.6), 0 0 60px rgba(0,212,255,0.3); }
+      66%  { color: #a78bfa; text-shadow: 0 0 30px rgba(167,139,250,0.6), 0 0 60px rgba(167,139,250,0.3); }
+      100% { color: #ffffff; text-shadow: 0 0 20px rgba(255,255,255,0.4), 0 0 40px rgba(255,255,255,0.2); }
     }
-    .hero h1 .cyan { color: var(--cyan); }
-    .hero h1 .purple { color: var(--purple); }
+    @keyframes dieties-float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+    .hero h1.dieties-title {
+      font-size: clamp(3.5rem, 9vw, 5.5rem);
+      font-weight: 800;
+      margin-bottom: 1.25rem;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      animation: dieties-cycle 6s ease-in-out infinite, dieties-float 4s ease-in-out infinite;
+      will-change: transform, color, text-shadow;
+    }
     .hero .tagline-main {
       font-size: 0.85rem;
       color: var(--muted);
@@ -919,11 +930,10 @@
 <!-- ══ NAV ════════════════════════════════════════════════════════════ -->
 <nav>
   <a href="https://atlasmarkets.org" class="logo" style="text-decoration:none;">ATLAS<span>MARKETS</span></a>
-  <a href="/dieties" class="product-name" style="text-decoration:none;color:var(--purple);font-weight:700;font-size:0.85rem;margin-left:0.75rem;">Dieties</a>
   <div class="meta">x402 · Base Mainnet</div>
   <div class="links">
     <a href="#products">products</a>
-    <a href="/api/llms.txt">quickstart</a>
+    <a href="/llms.txt">llms.txt</a>
     <a href="/openapi.json">OpenAPI</a>
     <a href="https://x402.org" target="_blank">x402</a>
   </div>
@@ -931,7 +941,7 @@
 
 <!-- ══ HERO ════════════════════════════════════════════════════════════ -->
 <section class="hero">
-  <h1>Dieties</h1>
+  <h1 class="dieties-title">Dieties</h1>
   <p class="tagline-main">
     Dieties is <span>not a buy/sell oracle.</span> It gives agents structured market context they can verify.
   </p>
@@ -945,7 +955,6 @@
 
 <!-- ══ DIETIES SUB-PRODUCT ═════════════════════════════════════════════ -->
 <section class="dieties-section" id="dieties">
-  <h2>Dieties</h2>
   <p class="dieties-npm">npm: atlasmarkets-dieties</p>
   <p class="dieties-desc">Eleven specialized market intelligence services for AI agents. Signals, technical indicators, sentiment, whale activity, calendars, funding, options. x402-protected on Base. No API key.</p>
   <a class="view-docs-link" href="#products">View Docs →</a>
