@@ -95,25 +95,22 @@
       max-width: 900px;
       margin: 0 auto;
     }
-    /* ── ATLASMARKETS FLOATING HERO TITLE ── */
+    /* ── ATLASMARKETS HERO TITLE ── */
     @keyframes atlasmarkets-cycle {
       0%   { color: #ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.5), 0 0 60px rgba(255,255,255,0.3); }
       33%  { color: #00d4ff; text-shadow: 0 0 40px rgba(0,212,255,0.7), 0 0 80px rgba(0,212,255,0.4); }
       66%  { color: #a78bfa; text-shadow: 0 0 40px rgba(167,139,250,0.7), 0 0 80px rgba(167,139,250,0.4); }
       100% { color: #ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.5), 0 0 60px rgba(255,255,255,0.3); }
     }
-    @keyframes atlasmarkets-float {
-      0%, 100% { transform: translateY(0); }
-      50%      { transform: translateY(-10px); }
-    }
     .hero h1.atlasmarkets-title {
-      font-size: clamp(5rem, 13vw, 9rem);
+      font-size: clamp(3.5rem, 9vw, 6.5rem);
       font-weight: 900;
-      margin-bottom: 1.5rem;
+      margin: 0 auto 1.25rem;
       line-height: 1.0;
       letter-spacing: -0.04em;
-      animation: atlasmarkets-cycle 6s ease-in-out infinite, atlasmarkets-float 4s ease-in-out infinite;
-      will-change: transform, color, text-shadow;
+      text-align: center;
+      animation: atlasmarkets-cycle 6s ease-in-out infinite;
+      will-change: color, text-shadow;
     }
     .hero p {
       font-size: 1rem;
