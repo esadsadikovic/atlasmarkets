@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AtlasMarkets — Dieties</title>
+  <title>AtlasMarkets — x402 AI Services on Base</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
@@ -526,6 +526,42 @@
     .badge.cyan { border-color: var(--cyan); color: var(--cyan); }
     .badge.purple { border-color: var(--purple); color: var(--purple); }
 
+    /* ── DIETIES SUB-PRODUCT ── */
+    .dieties-section {
+      text-align: center;
+      padding: 1.5rem 0 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .dieties-section h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+    .dieties-section .dieties-npm {
+      font-size: 0.85rem;
+      color: var(--cyan);
+      font-family: monospace;
+      margin-bottom: 0.5rem;
+    }
+    .dieties-section .dieties-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 auto 0.75rem;
+      line-height: 1.5;
+    }
+    .dieties-section .view-docs-link {
+      display: inline-block;
+      font-size: 0.8rem;
+      color: var(--cyan);
+      text-decoration: none;
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--cyan);
+      border-radius: 4px;
+    }
+    .dieties-section .view-docs-link:hover { background: rgba(0, 212, 255, 0.1); }
+
     /* ── GODS ROW ── */
     .gods-row {
       background: var(--surface);
@@ -899,14 +935,22 @@
     <a href="/" style="color: inherit; text-decoration: none;">AtlasMarkets</a>
   </h1>
   <p class="tagline-main">
-    Dieties is <span>not a buy/sell oracle.</span> It gives agents structured market context they can verify.
+    AtlasMarkets is <span>not a buy/sell oracle.</span> It gives agents structured market context they can verify.
   </p>
   <div class="hero-badges">
-    <a class="badge cyan" href="#panel-titan-indicators" style="text-decoration:none;">Titan Indicators →</a>
-    <a class="badge purple" href="#panel-anubis" style="text-decoration:none;">Anubis Signals →</a>
+    <a class="badge cyan" href="#dieties" style="text-decoration:none;">Dieties →</a>
+    <a class="badge purple" href="#titan-indicators" style="text-decoration:none;">Titan Indicators →</a>
     <a class="badge" href="#products" style="text-decoration:none;">11 Services</a>
     <a class="badge" href="https://x402.org" target="_blank" style="text-decoration:none;">x402 / USDC</a>
   </div>
+</section>
+
+<!-- ══ DIETIES SUB-PRODUCT ═════════════════════════════════════════════ -->
+<section class="dieties-section" id="dieties">
+  <h2>Dieties</h2>
+  <p class="dieties-npm">npm: atlasmarkets-dieties</p>
+  <p class="dieties-desc">Eleven specialized market intelligence services for AI agents. Signals, technical indicators, sentiment, whale activity, calendars, funding, options. x402-protected on Base. No API key.</p>
+  <a class="view-docs-link" href="#products">View Docs →</a>
 </section>
 
 <!-- ══ GODS ROW ════════════════════════════════════════════════════════ -->
