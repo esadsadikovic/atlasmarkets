@@ -38,13 +38,15 @@ _x402_server.register_extension(bazaar_resource_server_extension)
 
 # Pre-populate facilitator support for Base mainnet
 _x402_server._supported_responses = {
-    "eip155:8453": SupportedResponse(
-        kinds=[
-            SupportedKind(x402_version=2, scheme="exact", network="eip155:8453", extra={}),
-        ],
-        extensions=["bazaar"],
-        signers={},
-    )
+    "eip155:8453": {
+        "exact": SupportedResponse(
+            kinds=[
+                SupportedKind(x402_version=2, scheme="exact", network="eip155:8453", extra={}),
+            ],
+            extensions=["bazaar"],
+            signers={},
+        )
+    }
 }
 _x402_server._initialized = True
 
@@ -148,11 +150,11 @@ async def implied_volatility(symbol: str = Query(..., description="Symbol like B
         "ts": datetime.now(timezone.utc).isoformat()
     }
 
-@app.get("/health")
+@app.get("/health", openapi_extra={"security": []})
 async def health():
     return {"status": "ok", "service": "options", "version": "1.0.0"}
 
-@app.get("/favicon.ico")
+@app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     from starlette.responses import RedirectResponse
     return RedirectResponse(url="/static/favicon.ico", status_code=302)
