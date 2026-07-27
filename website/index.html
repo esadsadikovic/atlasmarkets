@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AtlasMarkets — The World's Premier AI Agent Market Intelligence Platform</title>
+  <title>AtlasMarkets — Eleven AI Agent Market Intelligence Services: Five Gods + Six Titans</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
@@ -686,6 +686,28 @@
       padding: 0.2rem 0.5rem;
     }
 
+    /* ── TITAN VISUAL DISTINCTION (purple accent) ── */
+    .product-card-titan {
+      border-color: var(--purple) !important;
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(167, 139, 250, 0.08) 100%);
+    }
+    .product-card-titan:hover { border-color: var(--cyan) !important; }
+    .product-card-titan .name { color: var(--purple); }
+    .product-card-titan.active {
+      border-color: var(--purple) !important;
+      background: rgba(167, 139, 250, 0.15) !important;
+    }
+    .titan-panel {
+      border: 1px solid var(--purple);
+      border-left: 4px solid var(--purple);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(167, 139, 250, 0.04) 100%);
+      margin-bottom: 1.5rem;
+    }
+    .titan-panel .port-badge { color: var(--purple) !important; border-color: var(--purple) !important; }
+    .titan-panel .pricing-panel-header .title { color: var(--purple); }
+
     /* ── PRICING TABLE ── */
     .pricing-table-wrap { margin-bottom: 2.5rem; }
     .pricing-table {
@@ -873,10 +895,10 @@
 <!-- ══ HERO ════════════════════════════════════════════════════════════ -->
 <section class="hero">
   <h1>
-    <span class="cyan">Five gods,</span><br/>
-    one verified loop.<br/>
-    <span class="purple">Journal a setup.</span><br/>
-    Verify the outcome.
+    <span class="cyan">Five gods + six titans,</span><br/>
+    eleven specialized services.<br/>
+    <span class="purple">One verified loop.</span><br/>
+    Journal a setup. Verify the outcome.
   </h1>
   <p class="tagline-main">
     AtlasMarkets is <span>not a buy/sell oracle.</span> It gives agents structured market context they can verify.
@@ -886,6 +908,7 @@
     <span class="badge purple">Calibrated 80% ranges</span>
     <span class="badge">Audit trail</span>
     <span class="badge">No API key</span>
+    <span class="badge">11 services / 55+ endpoints</span>
   </div>
 </section>
 
@@ -896,6 +919,12 @@
   <div class="god-pill"><span class="icon">☀️</span><span class="name">Apollo</span><span class="market">Forex</span><span class="port">:8003</span></div>
   <div class="god-pill"><span class="icon">⚡</span><span class="name">Pollux</span><span class="market">Commodities</span><span class="port">:8004</span></div>
   <div class="god-pill"><span class="icon">🐟</span><span class="name">Dagon</span><span class="market">On-Chain</span><span class="port">:8005</span></div>
+  <div class="god-pill" style="border-left: 2px solid var(--purple); margin-left: 1rem;"><span class="icon">📊</span><span class="name">Titan Indicators</span><span class="market">RSI/MACD/Bollinger/EMA</span><span class="port">:8006</span></div>
+  <div class="god-pill"><span class="icon">🎭</span><span class="name">Titan Sentiment</span><span class="market">Fear & Greed/News</span><span class="port">:8007</span></div>
+  <div class="god-pill"><span class="icon">🐋</span><span class="name">Titan Whale</span><span class="market">Large Tx Tracking</span><span class="port">:8008</span></div>
+  <div class="god-pill"><span class="icon">📅</span><span class="name">Titan Calendar</span><span class="market">Crypto Events</span><span class="port">:8009</span></div>
+  <div class="god-pill"><span class="icon">💸</span><span class="name">Titan Funding</span><span class="market">Perp Rates</span><span class="port">:8010</span></div>
+  <div class="god-pill"><span class="icon">📈</span><span class="name">Titan Options</span><span class="market">Options Flow/IV</span><span class="port">:8011</span></div>
 </div>
 
 <!-- ══ VERIFIED LOOP ══════════════════════════════════════════════════ -->
@@ -992,6 +1021,36 @@
       <span class="icon">🐟</span>
       <span class="name">Dagon</span>
       <span class="market">On-Chain</span>
+    </div>
+    <div class="product-card product-card-titan" data-panel="titan-indicators" onclick="switchProduct(this)">
+      <span class="icon">📊</span>
+      <span class="name">Titan Indicators</span>
+      <span class="market">RSI/MACD/Bollinger/EMA</span>
+    </div>
+    <div class="product-card product-card-titan" data-panel="titan-sentiment" onclick="switchProduct(this)">
+      <span class="icon">🎭</span>
+      <span class="name">Titan Sentiment</span>
+      <span class="market">Fear & Greed/News</span>
+    </div>
+    <div class="product-card product-card-titan" data-panel="titan-whale" onclick="switchProduct(this)">
+      <span class="icon">🐋</span>
+      <span class="name">Titan Whale</span>
+      <span class="market">Large Tx Tracking</span>
+    </div>
+    <div class="product-card product-card-titan" data-panel="titan-calendar" onclick="switchProduct(this)">
+      <span class="icon">📅</span>
+      <span class="name">Titan Calendar</span>
+      <span class="market">Crypto Events</span>
+    </div>
+    <div class="product-card product-card-titan" data-panel="titan-funding" onclick="switchProduct(this)">
+      <span class="icon">💸</span>
+      <span class="name">Titan Funding</span>
+      <span class="market">Perp Rates</span>
+    </div>
+    <div class="product-card product-card-titan" data-panel="titan-options" onclick="switchProduct(this)">
+      <span class="icon">📈</span>
+      <span class="name">Titan Options</span>
+      <span class="market">Options Flow/IV</span>
     </div>
   </div>
 
@@ -1114,6 +1173,128 @@
           <tr><td class="ep">/api/dagon/audit</td><td class="desc">Verify prior on-chain decision — gas saved or wasted</td><td class="price">$0.07</td></tr>
           <tr><td class="ep">/api/dagon/forecast</td><td class="desc">80% calibrated gas price range over next hour</td><td class="price">$0.05</td></tr>
           <tr><td class="ep">/api/dagon/risk</td><td class="desc">On-chain risk state — gas market, DeFi health, BTC fees</td><td class="price">$0.02</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TITAN INDICATORS -->
+    <div class="pricing-panel titan-panel" id="panel-titan-indicators">
+      <div class="pricing-panel-header">
+        <span class="icon">📊</span>
+        <div>
+          <div class="title">Titan Indicators — Technical Analysis</div>
+          <div class="sub">Crypto OHLC (CoinGecko) + Stocks (Yahoo Finance). RSI, MACD, Bollinger Bands, EMA.</div>
+        </div>
+        <div class="port-badge">:8006</div>
+      </div>
+      <table class="pricing-table">
+        <thead><tr><th>Endpoint</th><th>What it does</th><th>Price</th></tr></thead>
+        <tbody>
+          <tr><td class="ep">/api/indicators/rsi</td><td class="desc">Relative Strength Index (14-period) — oversold/overbought/neutral</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/indicators/macd</td><td class="desc">MACD 12/26/9 with signal line, histogram, bullish/bearish</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/indicators/bollinger</td><td class="desc">Bollinger Bands (20, 2σ) with position-in-band</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/indicators/ema</td><td class="desc">EMA 5/10/20/50/200 — trend identification, crossovers</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/indicators/all</td><td class="desc">All four indicators in one response (saves x402 payments)</td><td class="price">$0.10</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TITAN SENTIMENT -->
+    <div class="pricing-panel titan-panel" id="panel-titan-sentiment">
+      <div class="pricing-panel-header">
+        <span class="icon">🎭</span>
+        <div>
+          <div class="title">Titan Sentiment — Market Sentiment</div>
+          <div class="sub">Crypto Fear & Greed (Alternative.me) + news sentiment</div>
+        </div>
+        <div class="port-badge">:8007</div>
+      </div>
+      <table class="pricing-table">
+        <thead><tr><th>Endpoint</th><th>What it does</th><th>Price</th></tr></thead>
+        <tbody>
+          <tr><td class="ep">/api/sentiment/fear_greed</td><td class="desc">Fear & Greed score 0-100 (Extreme Fear to Extreme Greed)</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/sentiment/news</td><td class="desc">Recent news headlines with sentiment scoring</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/sentiment/all</td><td class="desc">Combined fear & greed + news</td><td class="price">$0.08</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TITAN WHALE -->
+    <div class="pricing-panel titan-panel" id="panel-titan-whale">
+      <div class="pricing-panel-header">
+        <span class="icon">🐋</span>
+        <div>
+          <div class="title">Titan Whale — Large Transaction Tracking</div>
+          <div class="sub">BTC and Ethereum large transactions >$100K</div>
+        </div>
+        <div class="port-badge">:8008</div>
+      </div>
+      <table class="pricing-table">
+        <thead><tr><th>Endpoint</th><th>What it does</th><th>Price</th></tr></thead>
+        <tbody>
+          <tr><td class="ep">/api/whale/alerts</td><td class="desc">Large transaction alerts (hash, USD amount, source/dest)</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/whale/flows</td><td class="desc">Aggregate net inflow/outflow by asset</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/whale/summary</td><td class="desc">High-level whale activity summary</td><td class="price">$0.08</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TITAN CALENDAR -->
+    <div class="pricing-panel titan-panel" id="panel-titan-calendar">
+      <div class="pricing-panel-header">
+        <span class="icon">📅</span>
+        <div>
+          <div class="title">Titan Calendar — Event Scheduling</div>
+          <div class="sub">Crypto economic events, token unlocks, exchange listings, upgrades</div>
+        </div>
+        <div class="port-badge">:8009</div>
+      </div>
+      <table class="pricing-table">
+        <thead><tr><th>Endpoint</th><th>What it does</th><th>Price</th></tr></thead>
+        <tbody>
+          <tr><td class="ep">/api/calendar/upcoming</td><td class="desc">Upcoming crypto events</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/calendar/recent</td><td class="desc">Recent crypto events</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/calendar/check</td><td class="desc">Events on a specific date</td><td class="price">$0.02</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TITAN FUNDING -->
+    <div class="pricing-panel titan-panel" id="panel-titan-funding">
+      <div class="pricing-panel-header">
+        <span class="icon">💸</span>
+        <div>
+          <div class="title">Titan Funding — Perpetual Futures Rates</div>
+          <div class="sub">Funding rates across Binance, Bybit, OKX, dYdX</div>
+        </div>
+        <div class="port-badge">:8010</div>
+      </div>
+      <table class="pricing-table">
+        <thead><tr><th>Endpoint</th><th>What it does</th><th>Price</th></tr></thead>
+        <tbody>
+          <tr><td class="ep">/api/funding/rates</td><td class="desc">Current funding rates (BTC, ETH, top alts)</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/funding/predicted</td><td class="desc">Predicted next funding rates</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/funding/all</td><td class="desc">Combined current + predicted</td><td class="price">$0.05</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TITAN OPTIONS -->
+    <div class="pricing-panel titan-panel" id="panel-titan-options">
+      <div class="pricing-panel-header">
+        <span class="icon">📈</span>
+        <div>
+          <div class="title">Titan Options — Options Intelligence</div>
+          <div class="sub">BTC and ETH options flow, alerts, implied volatility</div>
+        </div>
+        <div class="port-badge">:8011</div>
+      </div>
+      <table class="pricing-table">
+        <thead><tr><th>Endpoint</th><th>What it does</th><th>Price</th></tr></thead>
+        <tbody>
+          <tr><td class="ep">/api/options/flow</td><td class="desc">Unusual options activity (large trades, sweeps)</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/options/alerts</td><td class="desc">Significant options events</td><td class="price">$0.05</td></tr>
+          <tr><td class="ep">/api/options/iv</td><td class="desc">IV surface, IV rank, IV percentile</td><td class="price">$0.05</td></tr>
         </tbody>
       </table>
     </div>
