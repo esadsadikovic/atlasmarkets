@@ -44,22 +44,21 @@ Every endpoint cost between $0.02 and $0.15 USDC, paid automatically via the x40
 
 ## Competitive Advantage — Purpose-Built for AI Agents
 
-| Capability | CoinGecko | Alpha Vantage | CoinMarketCap | Bloomberg | Whale Alert | CoinOpAI Kronos | **AtlasMarkets** |
-|---|---|---|---|---|---|---|---|
-| Directional market signals | ❌ raw data only | ❌ raw data only | ❌ raw data only | ⚠️ analyst notes | ❌ | ❌ | ✅ bull/bear + magnitude |
-| Conformal prediction 80% intervals | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ distribution-free, regime-adaptive |
-| Decision journaling (UUID) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ decision_id per journal entry |
-| Outcome audit (GOOD vs BAD) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ verifiable against real prices |
-| Preflight risk check | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ can_decide, cooldown, volatility |
-| On-chain ETH gas + BTC fees + DeFi TVL | ❌ partial | ❌ | ❌ | ❌ | ❌ alerts only | ❌ | ✅ combined in one endpoint |
-| x402 micropayments (USDC/Base) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ pay-per-call, no API key |
-| MCP server (50+ tools) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ npx -y atlasmarkets-mcp |
-| No API key | ❌ | ❌ | ❌ | ❌ | ⚠️ needs key | ❌ | ✅ |
-| No registration | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| No monthly fee | ❌ $29/mo | ❌ $49.99/mo | ❌ paid tiers | ❌ thousands/mo | ❌ paid tiers | ❌ subscription | ✅ pay per call only |
-| Market verticals | 1 (crypto) | 2 (stocks + crypto) | 1 (crypto) | many but human | 1 (whale) | 1 (crypto) | **11 services, 5 markets + 6 specialist** |
-| Decision audit trail | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | **✅ unique — no competitor offers this** |
-
+| Capability | CG | AV | CMC | BB | WA | **AtlasMarkets** |
+|---|---|---|---|---|---|---|
+| Directional signals | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ bull/bear + magnitude |
+| Conformal 80% prediction | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ distribution-free, regime-adaptive |
+| Decision journal (UUID) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ decision_id per entry |
+| Outcome audit (verdict) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ GOOD/BAD verifiable vs prices |
+| Preflight risk check | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ can_decide, cooldown, volatility |
+| On-chain (gas+fees+TVL) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ ETH gas + BTC fees + DeFi |
+| x402 / USDC micropayments | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ pay-per-call, no API key |
+| MCP server | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ 50+ tools, npx install |
+| No API key | ❌ | ❌ | ❌ | ❌ | ⚠️ | ✅ |
+| No registration | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| No monthly fee | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ pay per call only |
+| Market verticals | 1 | 2 | 1 | many | 1 | **11 services (5+6)** |
+| **Decision audit trail** | ❌ | ❌ | ❌ | ❌ | ❌ | **✅ unique — no competitor** |
 ---
 
 ## All Eleven Services (55+ Endpoints)
